@@ -36,6 +36,7 @@ def build(out_dir=None):
         "id": w["id"], "c": w["company_id"], "ti": w.get("title") or "Webcast", "u": w["url"],
         "d": w.get("date"), "ty": w.get("event_type", "Other"), "cf": w.get("conference_id"),
         "src": w.get("source_url"), "fs": w.get("first_seen", "")[:10],
+        "k": w.get("kind", "webcast"),
     } for w in webcasts]
     # Newest first; undated links go last rather than masquerading as recent.
     webcast_rows.sort(key=lambda r: (r["d"] is not None, r["d"] or "", r["fs"]), reverse=True)

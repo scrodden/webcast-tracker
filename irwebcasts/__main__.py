@@ -15,7 +15,7 @@ import sys
 
 from collections import Counter
 
-from . import build, crawl, discover, store, universe
+from . import build, crawl, discover, newswire, store, universe
 
 
 def debug(urls):
@@ -67,6 +67,22 @@ def debug(urls):
         renderer.close()
 
 
+def press_releases(tickers=None, months=1):
+    """Events announced on GlobeNewswire (reaches companies whose IR sites block crawlers)."""
+    from .http import Fetcher
+    companies = store.load_companies()
+    wanted = {t.upper() for t in tickers} if tickers else None
+    chosen = [c for c in companies.values() if c.get("listed", True)
+              and (wanted is None or wanted & set(c.get("tickers", [])))]
+    webcasts = store.load_webcasts()
+    # First run reaches back a year; after that the current month is enough.
+    months = months if newswire.SEEN_FILE.exists() else 12
+    result = newswire.run(chosen, webcasts, Fetcher(), months=months)
+    store.save_webcasts(webcasts)
+    store.save_companies(companies)
+    return result
+
+
 def report(tickers=None):
     """Per-company results, for checking a run from its log."""
     companies = store.load_companies()
@@ -86,7 +102,8 @@ def report(tickers=None):
               f"webcasts={per_company[c['id']]}")
         for w in sorted((w for w in webcasts if w["company_id"] == c["id"]),
                         key=lambda w: w.get("date") or "", reverse=True)[:8]:
-            print(f"      {w.get('date') or '----------'}  {w.get('title')!r:60.60}  {w['url']}")
+            print(f"      {w.get('date') or '----------'}  {w.get('title')!r:60.60}  {w['url']}"
+                  f"{'  [event page]' if w.get('kind') == 'event' else ''}")
 
 
 def main(argv=None):
@@ -143,6 +160,7 @@ def main(argv=None):
         print("universe:", universe.refresh(tickers=tickers))
         print("discover:", discover.run(max_minutes=args.discover_minutes, tickers=tickers))
         print("crawl:", crawl.run(max_minutes=args.crawl_minutes, render=not args.no_render, tickers=tickers))
+        print("press releases:", press_releases(tickers))
         print("build:", build.build())
         report(tickers)
     return 0

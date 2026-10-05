@@ -60,7 +60,7 @@ class NoiseTests(unittest.TestCase):
         found = extract_webcasts(html, "https://www.microsoft.com/en-us/investor/default")
         self.assertEqual([(w["url"], w["title"]) for w in found], [
             ("https://www.microsoft.com/en-us/investor/earnings/fy-2026-q4/press-release-webcast",
-             "Earnings Release FY26 Q4")])
+             "FY 2026 Q4 Earnings")])
 
 
 class YouTubeTests(unittest.TestCase):

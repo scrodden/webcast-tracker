@@ -63,6 +63,27 @@ def find_event_date(text, earliest=None, latest=None):
     return found[0][1] if found else None
 
 
+_MONTH_DAY = re.compile(r"\b" + _MONTH_RE + r"\s+(\d{1,2})(?:st|nd|rd|th)?\b(?!,?\s+20\d\d)", re.I)
+
+
+def find_date_near(text, reference):
+    """First date in text; a month-day without a year ('Thursday, Sept. 10') is taken
+    as the next such day on or after `reference` (YYYY-MM-DD)."""
+    full = find_all(text)
+    partial = []
+    ref = date.fromisoformat(reference)
+    for m in _MONTH_DAY.finditer(text or ""):
+        try:
+            d = date(ref.year, _MONTHS[m[1].lower().rstrip(".")], int(m[2]))
+        except (ValueError, KeyError):
+            continue
+        if d < ref.replace(day=1):
+            d = d.replace(year=ref.year + 1)
+        partial.append((m.start(), d.isoformat()))
+    found = sorted(full + partial)
+    return found[0][1] if found else None
+
+
 def strip_dates(text):
     """Remove date-ish fragments so they don't pollute titles."""
     for pattern, _ in _PATTERNS:

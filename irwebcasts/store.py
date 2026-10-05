@@ -54,9 +54,14 @@ def webcast_id(company_id, url):
     return hashlib.sha1(f"{company_id}|{url}".encode()).hexdigest()[:12]
 
 
-def upsert_webcast(webcasts, company_id, url, title, date, source, source_url):
-    """Insert or refresh one webcast; returns True when it is new."""
-    wid = webcast_id(company_id, url)
+def upsert_webcast(webcasts, company_id, url, title, date, source, source_url, kind="webcast"):
+    """Insert or refresh one webcast; returns True when it is new.
+
+    kind="event" marks an announced event whose link is the company's own webcast
+    page rather than the player itself (keyed by date and title as well, since
+    several events share that page).
+    """
+    wid = webcast_id(company_id, url if kind == "webcast" else f"{url}|{date}|{title}")
     seen = now_iso()
     existing = webcasts.get(wid)
     if existing:
@@ -75,6 +80,7 @@ def upsert_webcast(webcasts, company_id, url, title, date, source, source_url):
         "date": date,
         "source": source,
         "source_url": source_url,
+        "kind": kind,
         "first_seen": seen,
         "last_seen": seen,
     }

@@ -137,7 +137,12 @@ _TITLE_CLASS = re.compile(r"title|headline|heading|name|subject", re.I)
 
 def _usable(text):
     text = strip_dates(_clean(text))
-    if re.search(r"debug info|cvtoken|javascript|cookie", text, re.I):
+    if re.search(r"debug info|cvtoken|javascript|cookie|opens? .{0,20}in (?:a )?new window", text, re.I):
+        return None
+    # Document labels and site sections ("HTML for 2025 Q2", "SEC Filings", "Overview").
+    if re.fullmatch(r"(?:html|pdf|xbrl|10-[qk]|8-k|view all|see all|sec filings|investor relations|overview|"
+                    r"news center|newsroom|home|press release|news release|earnings release|.*\bleadership)"
+                    r"(?:\s+for\b.*|\s*\(.*\))?", text, re.I):
         return None
     if len(text) < 8 or _is_generic(text) or re.fullmatch(r"[\d\s:/.,apmAPMET-]+", text):
         return None
@@ -184,8 +189,33 @@ def _describe(a):
     return title or "", date
 
 
+def _humanize(words):
+    out = []
+    for w in words.split():
+        if re.fullmatch(r"q\d|fy\d*", w, re.I):
+            out.append(w.upper())
+        elif w.islower():
+            out.append(w.capitalize())
+        else:
+            out.append(w)
+    return " ".join(out)
+
+
+def slug_title(url):
+    """An event name spelled out in the address:
+    '…/event-details/2026/2026-Q1-Earnings-Call-2026-nW8k/' → '2026 Q1 Earnings Call'."""
+    for segment in reversed([x for x in urlsplit(url).path.split("/") if x]):
+        if re.match(r"(?:default|index)\.", segment):
+            continue
+        m = re.match(r"(.*?(?:earnings[-_]call|conference|investor[-_]day|annual[-_]meeting|summit|symposium|forum))",
+                     segment, re.I)
+        if m:
+            return _humanize(re.sub(r"[-_]+", " ", m.group(1)).strip())
+    return ""
+
+
 def title_from_url(url):
-    """'…/earnings/fy-2026-q4/press-release-webcast' → 'FY 2026 Q4 Earnings'."""
+    """Fallback: '…/earnings/fy-2026-q4/press-release-webcast' → 'FY 2026 Q4 Earnings'."""
     path = urlsplit(url).path.lower()
     m = re.search(r"fy[-_ ]?(\d{2,4})[-_ ]?q([1-4])|q([1-4])[-_ ]?(?:fy)?[-_ ]?(\d{2,4})", path)
     if m and "earning" in path:
@@ -199,18 +229,21 @@ def unwrap(url):
     """Undo e-mail security link wrapping (Proofpoint urldefense, Outlook safelinks)."""
     m = re.match(r"https?://urldefense(?:\.proofpoint)?\.com/v3/__(.+?)__;", url)
     if m:
-        inner = m.group(1)
-        return re.sub(r"^(https?):/(?!/)", r"\1://", inner)
+        return re.sub(r"^(https?):/(?!/)", r"\1://", m.group(1))
     if "safelinks.protection.outlook.com" in url:
         from urllib.parse import parse_qs
-        target = parse_qs(urlsplit(url).query).get("url", [""])[0]
-        return target or url
+        return parse_qs(urlsplit(url).query).get("url", [""])[0] or url
     return url
 
 
 def extract_webcasts(html, base_url):
     """Return [{url, title, date}] for every webcast link on the page."""
     soup = BeautifulSoup(html, "lxml")
+    # Site-wide menus, headers and footers are navigation, not event listings.
+    for chrome in soup.find_all(["nav", "header", "footer"]):
+        chrome.decompose()
+    for chrome in soup.find_all(attrs={"role": ["navigation", "banner", "contentinfo"]}):
+        chrome.decompose()
     found, seen = {}, set()
     for a in soup.find_all(["a", "iframe"]):
         raw = a.get("href") if a.name == "a" else a.get("src")
@@ -233,7 +266,16 @@ def extract_webcasts(html, base_url):
         if is_youtube_video(href) and not date and not _LINK_TEXT_RE.search(_clean(a.get_text(" "))):
             continue  # a corporate/marketing video rather than a streamed event
         seen.add(key)
-        found[href] = {"url": href, "title": title or title_from_url(href), "date": date}
+        if is_webcast_url(href):
+            title = slug_title(href) or title or title_from_url(href)
+        else:
+            # A page on the company's own site counts only if it is clearly about a
+            # specific event: dated, or named in its address.
+            url_title = slug_title(href) or title_from_url(href)
+            if not date and not url_title:
+                continue
+            title = url_title or title
+        found[href] = {"url": href, "title": title, "date": date}
     return list(found.values())
 
 

@@ -18,14 +18,16 @@ from urllib.parse import urlsplit
 from . import config
 
 _KEYWORD = r"(?:Conference|Summit|Symposium|Forum|Showcase|Expo|Investor Days?)"
+_WORD = r"(?:[A-Z0-9][\w.&'’+/-]*|of|and|for|in|on|the|de|&|\+|-)"
 _CONF_RE = re.compile(
-    r"((?:[A-Z0-9][\w.&'’+/-]*|of|and|for|in|on|the|de|&|\+|-)(?:\s+(?:[A-Z0-9][\w.&'’+/-]*|of|and|for|in|on|the|de|&|\+|-))*?\s+"
-    + _KEYWORD + r")(?!\s+(?:[Cc]alls?|ID|Id|[Ll]ine|[Nn]umber|[Cc]ode|[Oo]perator|[Rr]oom)\b)(?:\s+(?:20\d\d|on\s+(?!(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Mon|Tue|Wed|Thu|Fri|Sat|Sun)[a-z]*\b)[A-Z][\w&-]*(?:\s+[A-Z][\w&-]*){0,3}))?")
+    r"(" + _WORD + r"(?:,?\s+" + _WORD + r")*?\s+" + _KEYWORD
+    + r")(?!\s+(?:[Cc]alls?|ID|Id|[Ll]ine|[Nn]umber|[Cc]ode|[Oo]perator|[Rr]oom)\b)(?:\s+(?:20\d\d|on\s+(?!(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Mon|Tue|Wed|Thu|Fri|Sat|Sun)[a-z]*\b)[A-Z][\w&-]*(?:\s+[A-Z][\w&-]*){0,3}))?")
 # Words that end up in front of the name but aren't part of it.
 _LEAD_JUNK = re.compile(
     r"^(?:(?:the|at|in|to|a|an|of|and|for|on|will|present|presents|presenting|presentation|"
     r"participate|participates|participating|participation|fireside|chat|webcast|live|"
-    r"company|management|ceo|cfo|host|hosts|virtual|annual|inaugural)\b\s*)+", re.I)
+    r"company|management|ceo|cfo|host|hosts|virtual|annual|inaugural|"
+    r"[ap]\.?m\.?|pt|et|ct|mt|est|edt|pst|pdt)\b\.?,?\s*|[\d:.,]+\s*)+", re.I)
 _NOT_CONFERENCE = re.compile(
     r"^(?:earnings|quarterly|results|investor|analyst|annual|shareholder|stockholder|special|"
     r"press|news|company|our|this|virtual|annual meeting)\s+" + _KEYWORD + r"$", re.I)

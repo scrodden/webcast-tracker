@@ -32,7 +32,13 @@ class Renderer:
         from playwright.sync_api import sync_playwright  # optional dependency
         self._pw = sync_playwright().start()
         # IRW_CHROMIUM points at an already-installed Chromium if Playwright's own isn't there.
-        self._browser = self._pw.chromium.launch(executable_path=os.environ.get("IRW_CHROMIUM") or None)
+        # IRW_BROWSER_PROXY: route the browser through a proxy (e.g. a sandbox egress proxy
+        # that re-signs TLS, in which case certificate errors are expected and ignored).
+        proxy = os.environ.get("IRW_BROWSER_PROXY")
+        self._browser = self._pw.chromium.launch(
+            executable_path=os.environ.get("IRW_CHROMIUM") or None,
+            proxy={"server": proxy} if proxy else None,
+            args=["--ignore-certificate-errors"] if proxy else [])
 
     def html(self, url):
         page = self._browser.new_page()
@@ -92,7 +98,7 @@ def crawl_company(company, fetcher, renderer=None):
         pages[url] = html
         return html
 
-    home = fetch(root)
+    home = fetch(root, render=True)
     if home is None:
         return None
     # Events pages entered by hand (data/overrides.csv) come first.
@@ -101,7 +107,7 @@ def crawl_company(company, fetcher, renderer=None):
     listing = list(dict.fromkeys([root] + company.get("events_urls", []) + found))
     detail = []
     for url in listing[:MAX_LISTING_PAGES]:
-        html = fetch(url, render=url != root)
+        html = fetch(url, render=True)
         if not html:
             continue
         results += [(w, url) for w in extract_webcasts(html, url)]

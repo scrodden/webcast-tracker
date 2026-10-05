@@ -85,7 +85,8 @@ function webcastTable({ rows, companies, conferences, container, showCompany = t
         return `<tr>
           <td class="date">${fmtDate(w.d)}${w.d && w.d >= today ? `<br><span class="chip upcoming">upcoming</span>` : ""}</td>
           ${showCompany ? `<td>${companyLink(c)}</td>` : ""}
-          <td><a href="${esc(w.u)}" target="_blank" rel="noopener">${esc(w.ti)}</a><br>
+          <td><a href="${esc(w.u)}" target="_blank" rel="noopener">${esc(w.ti)}</a>
+            ${w.k === "event" ? `<span class="chip" title="The company posts the webcast link on its own site">listen on company site</span>` : ""}<br>
             <span class="chip type-${esc(w.ty)}">${esc(w.ty)}</span>
             ${conf && showConference ? `<a class="chip" href="conference.html?id=${encodeURIComponent(conf.id)}">${esc(conf.name)}</a>` : ""}
             ${w.src ? `<a class="chip" href="${esc(w.src)}" target="_blank" rel="noopener">source</a>` : ""}</td>
