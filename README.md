@@ -61,7 +61,7 @@ for IR pages built in JavaScript (needs `pip install playwright && playwright in
 
 ## Fixing data by hand
 
-`data/overrides.csv` holds per-ticker corrections for the IR URL, website or sector. Use it for companies
+`data/overrides.csv` holds per-ticker corrections for the IR URL, website, sector and events page(s). Use it for companies
 the discovery step can't find or that Nasdaq puts in the wrong sector.
 
 ## Data files

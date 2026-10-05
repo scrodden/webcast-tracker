@@ -92,3 +92,8 @@ def _apply_override(company, override):
     if override.get("ir_url"):
         company["ir_url"] = override["ir_url"]
         company["ir_source"] = "override"
+    if override.get("events_url"):
+        company["events_urls"] = override["events_url"].split()
+        if not company.get("ir_url"):
+            company["ir_url"] = company["events_urls"][0]
+            company["ir_source"] = "override"

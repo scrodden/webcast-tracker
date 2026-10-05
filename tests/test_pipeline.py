@@ -110,6 +110,15 @@ class CrawlTests(unittest.TestCase):
         self.assertTrue(page.endswith("goldman-2025"))
         self.assertNotIn("https://www.otherbank.com/events", fetcher.requested)
 
+    def test_hand_entered_events_page_on_another_subdomain(self):
+        fetcher = FakeFetcher({
+            "https://stock.acme.com": (FIXTURES / "ir_home.html").read_text(),
+            "https://corporate.acme.com/news/events": (FIXTURES / "notified_events.html").read_text(),
+        })
+        company = {"ir_url": "https://stock.acme.com", "events_urls": ["https://corporate.acme.com/news/events"]}
+        urls = {w["url"] for w, _ in crawl_company(company, fetcher)}
+        self.assertIn("https://edge.media-server.com/mmc/p/abc123", urls)
+
 
 class NasdaqTests(unittest.TestCase):
     NASDAQ = """Symbol|Security Name|Market Category|Test Issue|Financial Status|Round Lot Size|ETF|NextShares

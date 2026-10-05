@@ -73,7 +73,9 @@ def crawl_company(company, fetcher, renderer=None):
     home = fetch(root)
     if home is None:
         return None
-    listing = [root] + [u for u in find_links(home, root, EVENTS_LINK_RE) if _site(u) == site]
+    # Events pages entered by hand (data/overrides.csv) come first.
+    listing = list(dict.fromkeys([root] + company.get("events_urls", []) + [
+        u for u in find_links(home, root, EVENTS_LINK_RE) if _site(u) == site]))
     detail = []
     for url in listing[:MAX_LISTING_PAGES]:
         html = fetch(url, render=url != root)
@@ -81,7 +83,7 @@ def crawl_company(company, fetcher, renderer=None):
             continue
         results += [(w, url) for w in extract_webcasts(html, url)]
         detail += [u for u in find_links(html, url, EVENT_DETAIL_RE)
-                   if _site(u) == site and u not in detail and u not in listing]
+                   if _site(u) in (site, _site(url)) and u not in detail and u not in listing]
 
     for url in detail[:MAX_DETAIL_PAGES]:
         html = fetch(url)
