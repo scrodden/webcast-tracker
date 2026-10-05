@@ -79,6 +79,14 @@ class YouTubeTests(unittest.TestCase):
         self.assertEqual(found["https://www.youtube.com/embed/def456"]["date"], "2026-06-05")
 
 
+class UnwrapTests(unittest.TestCase):
+    def test_urldefense(self):
+        from irwebcasts.extract import unwrap
+        wrapped = ("https://urldefense.com/v3/__https:/cc.webcasts.com/gold006/091426a_js/?entity=24_7NURBBQ"
+                   "__;!!IfjTnhH9!WcYvsRg4a$")
+        self.assertEqual(unwrap(wrapped), "https://cc.webcasts.com/gold006/091426a_js/?entity=24_7NURBBQ")
+
+
 class FakeResponse:
     def __init__(self, url, text):
         self.url, self.text = url, text

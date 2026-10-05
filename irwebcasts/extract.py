@@ -195,29 +195,44 @@ def title_from_url(url):
     return ""
 
 
+def unwrap(url):
+    """Undo e-mail security link wrapping (Proofpoint urldefense, Outlook safelinks)."""
+    m = re.match(r"https?://urldefense(?:\.proofpoint)?\.com/v3/__(.+?)__;", url)
+    if m:
+        inner = m.group(1)
+        return re.sub(r"^(https?):/(?!/)", r"\1://", inner)
+    if "safelinks.protection.outlook.com" in url:
+        from urllib.parse import parse_qs
+        target = parse_qs(urlsplit(url).query).get("url", [""])[0]
+        return target or url
+    return url
+
+
 def extract_webcasts(html, base_url):
     """Return [{url, title, date}] for every webcast link on the page."""
     soup = BeautifulSoup(html, "lxml")
-    found = {}
+    found, seen = {}, set()
     for a in soup.find_all(["a", "iframe"]):
         raw = a.get("href") if a.name == "a" else a.get("src")
         if not raw:
             continue
         if a.name == "iframe" and not is_webcast_url(urljoin(base_url, raw.strip())):
             continue
-        href = urljoin(base_url, raw.strip())
+        href = unwrap(urljoin(base_url, raw.strip()))
         if "#" in href:
             page, _, _ = href.partition("#")
             if page.rstrip("/").lower() == base_url.split("#")[0].rstrip("/").lower():
                 continue  # "skip to content" / "top of page" style anchors
             href = page
-        if not href.startswith("http") or href in found or not _looks_like_webcast(a, href):
+        key = href.lower().rstrip("/")
+        if not href.startswith("http") or key in seen or not _looks_like_webcast(a, href):
             continue
         if href.rstrip("/").lower() == base_url.rstrip("/").lower():
             continue
         title, date = _describe(a)
         if is_youtube_video(href) and not date and not _LINK_TEXT_RE.search(_clean(a.get_text(" "))):
             continue  # a corporate/marketing video rather than a streamed event
+        seen.add(key)
         found[href] = {"url": href, "title": title or title_from_url(href), "date": date}
     return list(found.values())
 

@@ -1,0 +1,27 @@
+name: Debug pages
+
+# Shows what the crawler sees on specific pages (plain download vs. headless
+# browser), for diagnosing companies where no webcasts are found.
+
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: "Space-separated page URLs"
+        required: true
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+      - env:
+          URLS: ${{ github.event.inputs.urls }}
+        run: python -m irwebcasts debug $URLS
