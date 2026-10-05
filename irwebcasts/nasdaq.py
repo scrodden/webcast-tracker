@@ -46,7 +46,7 @@ SECTOR_MAP = {
 # Securities that aren't a company's main equity line.
 _NOT_EQUITY = re.compile(
     r"\b(warrants?|rights?|(?<!common )units?|preferred|preference|notes?|debentures?|bonds?|"
-    r"depositary shares,? each|fixed[- ]to[- ]floating|perpetual|subordinated|% )", re.I)
+    r"depositary shares,? each|fixed[- ]to[- ]floating|perpetual|subordinated)\b|\d% ", re.I)
 # Words describing the share class, stripped to get the company name.
 _SECURITY_WORDS = re.compile(
     r"\s*[-–,]?\s*\b(class [a-z]\b.*|series [a-z]\b.*|common stock.*|common shares.*|ordinary shares.*|"

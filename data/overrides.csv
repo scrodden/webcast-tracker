@@ -1,6 +1,11 @@
 # Manual corrections, applied on every `universe` run. Leave a column blank to keep the automatic value.
 # sector must be one of the 11 names in irwebcasts/sectors.py (or "Other").
+# Nasdaq's own sector scheme differs from GICS for some companies (e.g. it puts Visa in
+# Consumer Discretionary); fix those here.
 ticker,ir_url,website,sector
 GOOGL,https://abc.xyz/investor/,abc.xyz,Communication Services
 META,https://investor.atmeta.com,meta.com,Communication Services
 AMZN,https://ir.aboutamazon.com,aboutamazon.com,Consumer Discretionary
+V,,,Financials
+MA,,,Financials
+WMT,,,Consumer Staples

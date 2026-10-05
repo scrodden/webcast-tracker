@@ -47,6 +47,22 @@ class Q4LayoutTests(unittest.TestCase):
         self.assertEqual(w["date"], "2026-10-28")
 
 
+class NoiseTests(unittest.TestCase):
+    def test_navigation_and_marketing_links_are_not_webcasts(self):
+        html = """<html><body>
+          <a href="#mainContent">Skip to main content</a>
+          <a href="/en-us/microsoft-365/outlook#modalvideo2" aria-label="Watch video">Faster emails, fewer errors</a>
+          <div><h3>Earnings Release FY26 Q4</h3>
+            <a href="/en-us/investor/earnings/fy-2026-q4/press-release-webcast">VIEW DETAILS ></a></div>
+        </body></html>"""
+        found = extract_webcasts(html, "https://www.microsoft.com/en-us/investor/earnings/fy-2026-q4/press-release-webcast")
+        self.assertEqual(found, [])  # only a link to the page itself
+        found = extract_webcasts(html, "https://www.microsoft.com/en-us/investor/default")
+        self.assertEqual([(w["url"], w["title"]) for w in found], [
+            ("https://www.microsoft.com/en-us/investor/earnings/fy-2026-q4/press-release-webcast",
+             "Earnings Release FY26 Q4")])
+
+
 class FakeResponse:
     def __init__(self, url, text):
         self.url, self.text = url, text
@@ -96,12 +112,13 @@ JPM$C|JPMorgan Chase & Co. Depositary Shares, each representing a 1/400th intere
 ET|Energy Transfer LP Common Units|N|ET|N|100|N|ET
 SPY|SPDR S&P 500 ETF Trust|P|SPY|Y|100|N|SPY
 NYT|New York Times Company (The) Common Stock|N|NYT|N|100|N|NYT
+UNH|UnitedHealth Group Incorporated Common Stock|N|UNH|N|100|N|UNH
 File Creation Time: 1005202615:00|||||||
 """
 
     def test_symbol_files(self):
         rows = {r["ticker"]: r for r in nasdaq.parse_symbol_files(self.NASDAQ, self.OTHER)}
-        self.assertEqual(set(rows), {"AAPL", "GOOGL", "GOOG", "BRK.A", "BRK.B", "ET", "NYT"})
+        self.assertEqual(set(rows), {"AAPL", "GOOGL", "GOOG", "BRK.A", "BRK.B", "ET", "NYT", "UNH"})
         self.assertEqual(rows["GOOG"]["name"], "Alphabet Inc.")
         self.assertEqual(rows["BRK.B"]["name"], "Berkshire Hathaway Inc.")
         self.assertEqual(rows["ET"]["name"], "Energy Transfer LP")
@@ -116,7 +133,14 @@ File Creation Time: 1005202615:00|||||||
         self.assertEqual(screener["AAPL"]["sector"], "Information Technology")
         self.assertEqual(screener["AAPL"]["market_cap"], 3.5e12)
         self.assertEqual(screener["BRK.B"]["sector"], "Financials")
-        self.assertEqual(pick_domain({"website": "https://www.apple.com"}), "apple.com")
+        self.assertEqual(pick_domain({"name": "Apple Inc.", "tickers": ["AAPL"],
+                                      "website": "https://www.apple.com"}), "apple.com")
+        # A subdomain is reduced to the company's domain; an unrelated site is ignored.
+        self.assertEqual(pick_domain({"name": "Visa Inc.", "tickers": ["V"],
+                                      "website": "https://corporate.visa.com/"}), "visa.com")
+        self.assertIsNone(pick_domain({"name": "Johnson & Johnson", "tickers": ["JNJ"],
+                                       "website": "http://www.jjmt.com.tw/"}))
+        self.assertEqual(discover.guess_domains({"name": "Johnson & Johnson", "tickers": ["JNJ"]})[0], "jnj.com")
 
     def test_wikidata_websites(self):
         payload = {"results": {"bindings": [

@@ -32,10 +32,12 @@ EXCLUDED_HOSTS = ("register.vevent.com", "vevent.com", "register-conf.media-serv
 
 _LINK_TEXT_RE = re.compile(
     r"\b(webcast|listen|replay|archived? (?:audio|presentation|event)|live audio|"
-    r"watch (?:the )?(?:live|replay|webcast|presentation|event|video)|audio archive|"
+    r"watch (?:the )?(?:live|replay|webcast|presentation|event)|audio archive|"
     r"view (?:the )?(?:webcast|replay|event|presentation recording))\b", re.I)
 _URL_RE = re.compile(r"webcast|/player|replay", re.I)
-_SKIP_URL_RE = re.compile(r"\.(pdf|pptx?|xlsx?|docx?|jpg|png|zip)(\?|$)|^mailto:|^tel:|^javascript:|podcast", re.I)
+_SKIP_URL_RE = re.compile(r"\.(pdf|pptx?|xlsx?|docx?|jpg|png|zip|m3u8)(\?|$)|^mailto:|^tel:|^javascript:|podcast", re.I)
+# A link found only by its URL must also live in an investor-ish part of the site.
+_IR_PATH_RE = re.compile(r"investor|/ir/|^ir\.|earnings|event|webcast|presentation|conference", re.I)
 
 # Words that describe the link rather than the event.
 _GENERIC = re.compile(
@@ -44,7 +46,8 @@ _GENERIC = re.compile(
     r"click here|here|audio|presentation|slides|transcript|event details|details|more|"
     r"register|add to calendar|download|pdf|play|archive|archived webcast|upcoming events?|"
     r"past events?|events?|and presentations|events & presentations|events and presentations|"
-    r"read more|learn more|documents?|materials?|event materials|presentation materials|resources|"
+    r"read more|learn more|skip to (?:main )?content|top of page|back to top|view details\W*|"
+    r"related (?:information|links)|earnings release pages?|documents?|materials?|event materials|presentation materials|resources|"
     r"downloads?|supplemental (?:information|materials)|related (?:documents|materials)|media|"
     r"audio webcast|video webcast|webcast & presentation|webcast and presentation|\W*)$",
     re.I)
@@ -104,11 +107,14 @@ def _looks_like_webcast(a, href):
         return False
     if is_webcast_url(href):
         return True
-    host = urlsplit(href).netloc.lower()
+    parts = urlsplit(href)
+    host = parts.netloc.lower()
     if any(host == h or host.endswith("." + h) for h in EXCLUDED_HOSTS):
         return False
     text = _clean(a.get_text(" ")) or a.get("title", "") or a.get("aria-label", "")
-    return bool(_LINK_TEXT_RE.search(text) or _URL_RE.search(urlsplit(href).path))
+    if _LINK_TEXT_RE.search(text):
+        return True
+    return bool(_URL_RE.search(parts.path) and _IR_PATH_RE.search(host + parts.path))
 
 
 _TITLE_CLASS = re.compile(r"title|headline|heading|name|subject", re.I)
@@ -116,6 +122,8 @@ _TITLE_CLASS = re.compile(r"title|headline|heading|name|subject", re.I)
 
 def _usable(text):
     text = strip_dates(_clean(text))
+    if re.search(r"debug info|cvtoken|javascript|cookie", text, re.I):
+        return None
     if len(text) < 8 or _is_generic(text) or re.fullmatch(r"[\d\s:/.,apmAPMET-]+", text):
         return None
     return text[:200]
@@ -161,18 +169,34 @@ def _describe(a):
     return title or "", date
 
 
+def title_from_url(url):
+    """'…/earnings/fy-2026-q4/press-release-webcast' → 'FY 2026 Q4 Earnings'."""
+    path = urlsplit(url).path.lower()
+    m = re.search(r"fy[-_ ]?(\d{2,4})[-_ ]?q([1-4])|q([1-4])[-_ ]?(?:fy)?[-_ ]?(\d{2,4})", path)
+    if m and "earning" in path:
+        year, q = (m[1], m[2]) if m[1] else (m[4], m[3])
+        year = year if len(year) == 4 else "20" + year
+        return f"{'FY ' if m[1] else ''}{year} Q{q} Earnings"
+    return ""
+
+
 def extract_webcasts(html, base_url):
     """Return [{url, title, date}] for every webcast link on the page."""
     soup = BeautifulSoup(html, "lxml")
     found = {}
     for a in soup.find_all("a", href=True):
         href = urljoin(base_url, a["href"].strip())
+        if "#" in href:
+            page, _, _ = href.partition("#")
+            if page.rstrip("/").lower() == base_url.split("#")[0].rstrip("/").lower():
+                continue  # "skip to content" / "top of page" style anchors
+            href = page
         if not href.startswith("http") or href in found or not _looks_like_webcast(a, href):
             continue
-        if href.rstrip("/") == base_url.rstrip("/"):
+        if href.rstrip("/").lower() == base_url.rstrip("/").lower():
             continue
         title, date = _describe(a)
-        found[href] = {"url": href, "title": title, "date": date}
+        found[href] = {"url": href, "title": title or title_from_url(href), "date": date}
     return list(found.values())
 
 

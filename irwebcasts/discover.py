@@ -45,22 +45,46 @@ def _name_tokens(name):
     return [t for t in re.findall(r"[a-z0-9]+", (name or "").lower()) if t not in _NAME_STOP and len(t) > 1]
 
 
+def registrable(host):
+    """'corporate.visa.com' → 'visa.com'; 'www.bbc.co.uk' → 'bbc.co.uk'."""
+    parts = host.lower().strip(".").split(".")
+    if len(parts) >= 3 and parts[-2] in ("co", "com", "net", "org") and len(parts[-1]) == 2:
+        return ".".join(parts[-3:])
+    return ".".join(parts[-2:])
+
+
+def _matches_company(host, company):
+    tokens = _name_tokens(company.get("name"))
+    tickers = [t.lower() for t in company.get("tickers", [])]
+    label = registrable(host).split(".")[0]
+    return any(t in label for t in tokens) or label in tickers
+
+
 def pick_domain(company):
-    """The company's own domain, from its website (override or Wikidata)."""
+    """The company's own domain, from its website (override or Wikidata).
+
+    A Wikidata website that doesn't resemble the company's name or ticker is
+    ignored (e.g. a foreign subsidiary's site), unless it's a manual override.
+    """
     if not company.get("website"):
         return None
-    return re.sub(r"^https?://(www\.)?", "", company["website"].strip()).split("/")[0].lower() or None
+    host = re.sub(r"^https?://", "", company["website"].strip()).split("/")[0]
+    if not host:
+        return None
+    if company.get("website_source") != "override" and not _matches_company(host, company):
+        return None
+    return registrable(host)
 
 
 def guess_domains(company):
     """Likely domains from the name: 'Agilent Technologies' → agilent.com, agilenttechnologies.com."""
     tokens = _name_tokens(company.get("name"))
-    out = []
+    out = [f"{t.lower()}.com" for t in company.get("tickers", [])[:1] if len(t) >= 3 and t.isalpha()]
     if tokens and len(tokens[0]) >= 4:
         out.append(f"{tokens[0]}.com")
     if len(tokens) > 1:
         out.append(f"{''.join(tokens[:2])}.com")
-    return out
+    return list(dict.fromkeys(out))
 
 
 def looks_like_ir(html):
@@ -72,7 +96,8 @@ def candidates(domain):
     """Usual IR addresses on a company domain."""
     return [p.format(d=domain) for p in (
         "https://investors.{d}", "https://investor.{d}", "https://ir.{d}",
-        "https://www.{d}/investors", "https://www.{d}/investor-relations", "https://{d}/investors")]
+        "https://stock.{d}", "https://www.{d}/investors", "https://www.{d}/investor-relations",
+        "https://{d}/investors", "https://corporate.{d}/investors")]
 
 
 def _search_results(query, fetcher, api_key):
@@ -86,7 +111,11 @@ def _search_results(query, fetcher, api_key):
                                     headers={"X-Subscription-Token": api_key, "Accept": "application/json"})
             return [r.get("url", "") for r in ((data or {}).get("web") or {}).get("results", [])]
         resp = fetcher.get(DDG_URL, params={"q": query}, retries=1)
-    return parse_ddg(resp.text) if resp is not None else []
+    results = parse_ddg(resp.text) if resp is not None else []
+    if not results:
+        status = "no response" if resp is None else f"HTTP {resp.status_code}, {len(resp.text)} bytes"
+        print(f"search: no results for {query!r} ({status})")
+    return results
 
 
 def parse_ddg(html):
@@ -146,8 +175,8 @@ def discover_one(company, fetcher, search_key=None):
         resp = fetcher.get(url, retries=0)
         if resp is not None and looks_like_ir(resp.text):
             return resp.url, "search"
-    if not domain:
-        for guess in guess_domains(company):
+    for guess in guess_domains(company):
+        if guess != domain:
             url, how = _try_domain(guess, fetcher)
             if url:
                 return url, "name-guess"

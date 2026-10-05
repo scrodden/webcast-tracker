@@ -36,7 +36,12 @@ class Renderer:
     def html(self, url):
         page = self._browser.new_page()
         try:
-            page.goto(url, wait_until="networkidle", timeout=30000)
+            page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            try:
+                page.wait_for_load_state("networkidle", timeout=8000)
+            except Exception:
+                pass  # pages with background polling never go idle; use what has loaded
+            page.wait_for_timeout(1500)
             return page.content()
         except Exception:
             return None
