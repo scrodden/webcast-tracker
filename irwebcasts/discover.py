@@ -133,7 +133,7 @@ def parse_ddg(html):
 
 def search(company, fetcher, api_key=None):
     """IR site candidates from a web search for '<name> investor relations'."""
-    results = _search_results(f"{company['name']} investor relations", fetcher, api_key)
+    results = _search_results(f"{company['name']} investor relations website", fetcher, api_key)
     tokens = _name_tokens(company.get("name"))
     tickers = [t.lower() for t in company.get("tickers", [])]
 
