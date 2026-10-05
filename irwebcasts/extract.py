@@ -149,6 +149,8 @@ def _usable(text):
                     r"news center|newsroom|home|press release|news release|earnings release|.*\bleadership)"
                     r"(?:\s+for\b.*|\s*\(.*\))?", text, re.I):
         return None
+    if re.match(r"about\b", text, re.I):
+        return None  # 'About Alphabet Inc.' boilerplate at the end of releases
     if len(text) < 8 or _is_generic(text) or re.fullmatch(r"[\d\s:/.,apmAPMET-]+", text):
         return None
     return text[:200]
@@ -297,6 +299,44 @@ def find_links(html, base_url, pattern):
             if href not in out:
                 out.append(href)
     return out
+
+
+_ANNOUNCEMENT_URL = re.compile(r"news|press|release", re.I)
+_QUARTER_RE = re.compile(
+    r"\b((?:first|second|third|fourth)[- ]quarter(?:\s+(?:of\s+)?(?:fiscal\s+(?:year\s+)?)?(?:20\d\d))?|"
+    r"q[1-4]\s+(?:fiscal\s+)?(?:fy\s*)?20\d\d|(?:fiscal\s+)?(?:full[- ]year|year[- ]end)\s+20\d\d)", re.I)
+
+
+def announcement(html, url):
+    """(title, date) of the event a press release announces, or None.
+
+    'Alphabet to Present at the Goldman Sachs 2026 Communacopia + Technology
+    Conference' … 'on Tuesday, September 8, 2026' → that conference on 2026-09-08,
+    not the release's own date or its 'About Alphabet' boilerplate.
+    """
+    from .conferences import extract_conference_name
+    from .dates import find_event_date, find_all
+    soup = BeautifulSoup(html, "lxml")
+    for chrome in soup.find_all(["nav", "header", "footer", "script", "style"]):
+        chrome.decompose()
+    text = _clean(soup.get_text(" "))
+    if not (_ANNOUNCEMENT_URL.search(urlsplit(url).path) or re.search(r"today announced", text, re.I)):
+        return None
+    h1 = soup.find("h1")
+    headline = _clean(h1.get_text(" ")) if h1 else ""
+    if not headline or re.fullmatch(r"(?:news|press releases?|news releases?|news details)", headline, re.I):
+        headline = slug_title(url) or headline
+    title = extract_conference_name(headline)
+    if not title:
+        q = _QUARTER_RE.search(headline)
+        if q and re.search(r"conference call|earnings|results", headline, re.I):
+            title = f"{q.group(1).strip().title()} Earnings Call"
+    if not title:
+        return None
+    dates = find_all(text)
+    released = dates[0][1] if dates else None
+    when = find_event_date(text, earliest=released) if released else find_event_date(text)
+    return title, when
 
 
 def page_heading(html):

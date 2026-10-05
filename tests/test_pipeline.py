@@ -111,6 +111,24 @@ class InstructionTitleTests(unittest.TestCase):
         self.assertEqual(w["title"], "Alphabet at the Goldman Sachs Communacopia + Technology Conference")
 
 
+class AnnouncementTests(unittest.TestCase):
+    def test_press_release_names_and_dates_the_event(self):
+        from irwebcasts.crawl import _with_announcement
+        html = """<html><body><header><a href="/investor">Investors</a></header>
+          <h1>Alphabet to Present at the Goldman Sachs 2026 Communacopia + Technology Conference</h1>
+          <p>MOUNTAIN VIEW, Calif. - August 19, 2026 - Alphabet Inc. (NASDAQ: GOOG, GOOGL) today announced that
+          its CFO will present at the Goldman Sachs 2026 Communacopia + Technology Conference on Tuesday,
+          September 8, 2026 at 8:00 a.m. PT.</p>
+          <p>To access the live audio webcast of the session, please click
+             <a href="https://event.webcasts.com/viewer/event.jsp?ei=1773132">here</a>.</p>
+          <h3>About Alphabet Inc.</h3><p>Alphabet is a collection of businesses.</p></body></html>"""
+        url = ("https://abc.xyz/investor/news/news-details/2026/Alphabet-to-Present-at-the-Goldman-Sachs-2026-"
+               "Communacopia--Technology-Conference-2026-9xibpppaLF/default.aspx")
+        [w] = _with_announcement(extract_webcasts(html, url), html, url)
+        self.assertEqual(w["title"], "Goldman Sachs 2026 Communacopia + Technology Conference")
+        self.assertEqual(w["date"], "2026-09-08")
+
+
 class FakeResponse:
     def __init__(self, url, text):
         self.url, self.text = url, text
@@ -137,7 +155,7 @@ class CrawlTests(unittest.TestCase):
         found = {w["url"]: (w, page) for w, page in crawl_company({"ir_url": "https://investors.acme.com"}, fetcher)}
         self.assertIn("https://edge.media-server.com/mmc/p/abc123", found)
         gs, page = found["https://wsw.com/webcast/gsc25/acme/"]
-        self.assertEqual(gs["title"], "Acme Robotics at the Goldman Sachs Communacopia + Technology Conference")
+        self.assertEqual(gs["title"], "Goldman Sachs Communacopia + Technology Conference")
         self.assertEqual(gs["date"], "2025-09-09")
         self.assertTrue(page.endswith("goldman-2025"))
         self.assertNotIn("https://www.otherbank.com/events", fetcher.requested)

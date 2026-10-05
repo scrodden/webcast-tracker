@@ -12,7 +12,7 @@ import time
 from urllib.parse import urlsplit
 
 from . import config, store
-from .extract import EVENT_DETAIL_RE, EVENTS_LINK_RE, extract_webcasts, find_links, page_heading
+from .extract import EVENT_DETAIL_RE, EVENTS_LINK_RE, announcement, extract_webcasts, find_links, page_heading
 from .http import Fetcher
 
 MAX_LISTING_PAGES = 6
@@ -77,6 +77,18 @@ def events_rank(url):
     return 2 * score(last) + score(path)
 
 
+def _with_announcement(webcasts, html, url):
+    """On a press release about one event, name and date the webcast after that event."""
+    if not webcasts or len(webcasts) > 2:
+        return webcasts
+    ann = announcement(html, url)
+    if ann:
+        title, when = ann
+        for w in webcasts:
+            w["title"], w["date"] = title, when or w["date"]
+    return webcasts
+
+
 def crawl_company(company, fetcher, renderer=None):
     """Return [(webcast, source_page)] found on the company's IR site."""
     root = company["ir_url"]
@@ -110,7 +122,7 @@ def crawl_company(company, fetcher, renderer=None):
         html = fetch(url, render=True)
         if not html:
             continue
-        results += [(w, url) for w in extract_webcasts(html, url)]
+        results += [(w, url) for w in _with_announcement(extract_webcasts(html, url), html, url)]
         detail += [u for u in find_links(html, url, EVENT_DETAIL_RE)
                    if _site(u) in (site, _site(url)) and u not in detail and u not in listing]
 
@@ -119,7 +131,11 @@ def crawl_company(company, fetcher, renderer=None):
         if not html:
             continue
         heading, when = page_heading(html)
-        for w in extract_webcasts(html, url):
+        found_here = extract_webcasts(html, url)
+        if announcement(html, url) and len(found_here) <= 2:
+            results += [(w, url) for w in _with_announcement(found_here, html, url)]
+            continue
+        for w in found_here:
             # On a detail page the page heading names the event better than link text.
             if heading:
                 w["title"] = heading
