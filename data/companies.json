@@ -1,12 +1,14 @@
 {
  "us-aapl": {
   "country": "US",
+  "crawl_status": "ok:0",
   "exchange": "Nasdaq",
   "id": "us-aapl",
   "industry": "Computer Manufacturing",
   "ir_checked": "2026-10-05T19:14:39Z",
   "ir_source": "probe",
   "ir_url": "https://investor.apple.com/investor-relations/default.aspx",
+  "last_crawled": "2026-10-05T19:44:28Z",
   "listed": true,
   "market_cap": 4820749537600.0,
   "name": "Apple Inc.",
@@ -14,15 +16,17 @@
   "tickers": [
    "AAPL"
   ],
-  "website": "https://apple.com/at/"
+  "website": "https://apple.com/gn/"
  },
  "us-googl": {
   "country": "US",
+  "crawl_status": "ok:0",
   "exchange": "Nasdaq",
   "id": "us-googl",
   "industry": "Computer Software: Programming Data Processing",
   "ir_source": "override",
   "ir_url": "https://abc.xyz/investor/",
+  "last_crawled": "2026-10-05T19:44:33Z",
   "listed": true,
   "market_cap": 4136675200000.0,
   "name": "Alphabet Inc.",
@@ -36,10 +40,17 @@
  },
  "us-jnj": {
   "country": "US",
+  "crawl_status": "ok:0",
+  "events_urls": [
+   "https://www.investor.jnj.com/events-and-presentations/default.aspx"
+  ],
   "exchange": "NYSE",
   "id": "us-jnj",
   "industry": "Biotechnology: Pharmaceutical Preparations",
   "ir_checked": "2026-10-05T19:16:10Z",
+  "ir_source": "override",
+  "ir_url": "https://www.investor.jnj.com/events-and-presentations/default.aspx",
+  "last_crawled": "2026-10-05T19:44:33Z",
   "listed": true,
   "market_cap": 623344371100.0,
   "name": "Johnson & Johnson",
@@ -51,12 +62,14 @@
  },
  "us-lly": {
   "country": "US",
+  "crawl_status": "ok:18",
   "exchange": "NYSE",
   "id": "us-lly",
   "industry": "Biotechnology: Pharmaceutical Preparations",
   "ir_checked": "2026-10-05T19:14:40Z",
   "ir_source": "probe",
   "ir_url": "https://investor.lilly.com/",
+  "last_crawled": "2026-10-05T19:44:31Z",
   "listed": true,
   "market_cap": 1082419421190.0,
   "name": "Eli Lilly and Company",
@@ -68,16 +81,18 @@
  },
  "us-ma": {
   "country": "US",
+  "crawl_status": "ok:1",
   "exchange": "NYSE",
   "id": "us-ma",
   "industry": "Business Services",
   "ir_checked": "2026-10-05T19:14:40Z",
   "ir_source": "probe",
   "ir_url": "https://investor.mastercard.com/overview/default.aspx",
+  "last_crawled": "2026-10-05T19:45:09Z",
   "listed": true,
   "market_cap": 481805467000.0,
   "name": "Mastercard Incorporated",
-  "sector": "Consumer Discretionary",
+  "sector": "Financials",
   "tickers": [
    "MA"
   ],
@@ -85,12 +100,14 @@
  },
  "us-msft": {
   "country": "US",
+  "crawl_status": "ok:11",
   "exchange": "Nasdaq",
   "id": "us-msft",
   "industry": "Computer Software: Prepackaged Software",
   "ir_checked": "2026-10-05T19:14:39Z",
   "ir_source": "probe",
   "ir_url": "https://www.microsoft.com/en-us/investor/default",
+  "last_crawled": "2026-10-05T19:45:08Z",
   "listed": true,
   "market_cap": 3807819727785.0,
   "name": "Microsoft Corporation",
@@ -102,12 +119,14 @@
  },
  "us-nvda": {
   "country": "US",
+  "crawl_status": "ok:0",
   "exchange": "Nasdaq",
   "id": "us-nvda",
   "industry": "Semiconductors",
   "ir_checked": "2026-10-05T19:14:39Z",
   "ir_source": "probe",
   "ir_url": "https://investor.nvidia.com/home/default.aspx",
+  "last_crawled": "2026-10-05T19:44:42Z",
   "listed": true,
   "market_cap": 5563726000000.0,
   "name": "NVIDIA Corporation",
@@ -117,16 +136,44 @@
   ],
   "website": "https://www.nvidia.com/"
  },
+ "us-unh": {
+  "country": "US",
+  "crawl_status": "ok:0",
+  "events_urls": [
+   "https://www.unitedhealthgroup.com/investors.html"
+  ],
+  "exchange": "NYSE",
+  "id": "us-unh",
+  "industry": "Medical Specialities",
+  "ir_source": "override",
+  "ir_url": "https://www.unitedhealthgroup.com/investors.html",
+  "last_crawled": "2026-10-05T19:44:40Z",
+  "listed": true,
+  "market_cap": 327801638124.0,
+  "name": "UnitedHealth Group Incorporated",
+  "sector": "Health Care",
+  "tickers": [
+   "UNH"
+  ],
+  "website": "http://www.unitedhealthgroup.com/"
+ },
  "us-v": {
   "country": "US",
+  "crawl_status": "ok:0",
+  "events_urls": [
+   "https://investor.visa.com/events-calendar/"
+  ],
   "exchange": "NYSE",
   "id": "us-v",
   "industry": "Business Services",
   "ir_checked": "2026-10-05T19:14:41Z",
+  "ir_source": "override",
+  "ir_url": "https://investor.visa.com/events-calendar/",
+  "last_crawled": "2026-10-05T19:44:42Z",
   "listed": true,
   "market_cap": 642963867716.0,
   "name": "Visa Inc.",
-  "sector": "Consumer Discretionary",
+  "sector": "Financials",
   "tickers": [
    "V"
   ],
@@ -134,14 +181,21 @@
  },
  "us-wmt": {
   "country": "US",
+  "crawl_status": "ok:4",
+  "events_urls": [
+   "https://corporate.walmart.com/news/events"
+  ],
   "exchange": "Nasdaq",
   "id": "us-wmt",
   "industry": "Department/Specialty Retail Stores",
   "ir_checked": "2026-10-05T19:14:45Z",
+  "ir_source": "override",
+  "ir_url": "https://corporate.walmart.com/news/events",
+  "last_crawled": "2026-10-05T19:44:50Z",
   "listed": true,
   "market_cap": 827172383087.0,
   "name": "Walmart Inc.",
-  "sector": "Consumer Discretionary",
+  "sector": "Consumer Staples",
   "tickers": [
    "WMT"
   ],
