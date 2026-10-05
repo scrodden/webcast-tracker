@@ -101,6 +101,16 @@ class DedupeTests(unittest.TestCase):
         self.assertEqual(sorted(w["id"] for w in dedupe(rows)), ["2", "3"])
 
 
+class InstructionTitleTests(unittest.TestCase):
+    def test_instructions_are_not_titles(self):
+        html = """<div class="event"><h2>Alphabet at the Goldman Sachs Communacopia + Technology Conference</h2>
+          <p>September 9, 2026</p>
+          <p>To access the live audio webcast of the session, please click
+             <a href="https://event.webcasts.com/viewer/event.jsp?ei=1773132">here</a>.</p></div>"""
+        [w] = extract_webcasts(html, "https://abc.xyz/investor/events/event-details/2026/x/default.aspx")
+        self.assertEqual(w["title"], "Alphabet at the Goldman Sachs Communacopia + Technology Conference")
+
+
 class FakeResponse:
     def __init__(self, url, text):
         self.url, self.text = url, text

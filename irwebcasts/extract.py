@@ -139,6 +139,11 @@ def _usable(text):
     text = strip_dates(_clean(text))
     if re.search(r"debug info|cvtoken|javascript|cookie|opens? .{0,20}in (?:a )?new window", text, re.I):
         return None
+    # Instructions, not names: "To access the live audio webcast, please click ..."
+    if re.match(r"(?:to access|to listen|to view|to register|the live|a live|a replay|please|click|"
+                r"listen|join|participants|interested parties|investors (?:may|can))\b", text, re.I) \
+            or (len(text) > 70 and re.search(r"\b(?:click|please|will be available|can be accessed)\b", text, re.I)):
+        return None
     # Document labels and site sections ("HTML for 2025 Q2", "SEC Filings", "Overview").
     if re.fullmatch(r"(?:html|pdf|xbrl|10-[qk]|8-k|view all|see all|sec filings|investor relations|overview|"
                     r"news center|newsroom|home|press release|news release|earnings release|.*\bleadership)"
