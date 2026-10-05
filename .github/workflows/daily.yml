@@ -1,0 +1,60 @@
+name: Daily update
+
+# Refreshes the company list from Nasdaq, finds IR sites, crawls them for
+# webcast links (time-boxed, biggest/oldest first so the whole list rotates
+# through), rebuilds the site in docs/ and commits the result.
+
+on:
+  schedule:
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+    inputs:
+      crawl_minutes:
+        description: "Minutes to spend crawling IR sites"
+        default: "200"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    env:
+      # Optional: a Brave Search API key lets the crawler search
+      # "<company> investor relations" for companies it can't find otherwise.
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Test
+        run: python -m unittest discover -s tests
+
+      - name: Collect and build
+        run: |
+          python -m irwebcasts daily \
+            --crawl-minutes "${{ github.event.inputs.crawl_minutes || '200' }}"
+
+      - name: Commit
+        run: |
+          git config user.name "webcast-tracker-bot"
+          git config user.email "webcast-tracker-bot@users.noreply.github.com"
+          git add data docs
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Daily update $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git pull --rebase
+            git push
+          fi
