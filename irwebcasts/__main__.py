@@ -6,11 +6,38 @@ Steps, in pipeline order:
   crawl      visit IR sites and collect webcast links
   build      regenerate the static website
   daily      universe + discover + crawl + build, time-boxed
+  report     per-company results (website, IR site, webcasts)
+
+data/watchlist.txt limits `daily` to the tickers listed in it.
 """
 import argparse
 import sys
 
-from . import build, crawl, discover, universe
+from collections import Counter
+
+from . import build, crawl, discover, store, universe
+
+
+def report(tickers=None):
+    """Per-company results, for checking a run from its log."""
+    companies = store.load_companies()
+    webcasts = list(store.load_webcasts().values())
+    wanted = {t.upper() for t in tickers} if tickers else None
+    rows = [c for c in companies.values() if c.get("listed", True)
+            and (wanted is None or wanted & set(c.get("tickers", [])))]
+    per_company = Counter(w["company_id"] for w in webcasts)
+    print(f"report: {len(rows)} companies, {sum(1 for c in rows if c.get('website'))} with website, "
+          f"{sum(1 for c in rows if c.get('ir_url'))} with IR site, "
+          f"{sum(per_company[c['id']] for c in rows)} webcasts")
+    if len(rows) > 50:
+        return
+    for c in sorted(rows, key=lambda c: c["tickers"][0]):
+        print(f"  {c['tickers'][0]:6} {c.get('sector', '?'):24} website={c.get('website')} "
+              f"ir={c.get('ir_url')} ({c.get('ir_source')}) crawl={c.get('crawl_status')} "
+              f"webcasts={per_company[c['id']]}")
+        for w in sorted((w for w in webcasts if w["company_id"] == c["id"]),
+                        key=lambda w: w.get("date") or "", reverse=True)[:8]:
+            print(f"      {w.get('date') or '----------'}  {w.get('title')!r:60.60}  {w['url']}")
 
 
 def main(argv=None):
@@ -26,6 +53,7 @@ def main(argv=None):
     d.add_argument("--limit", type=int)
     d.add_argument("--retry-failed", action="store_true")
     d.add_argument("--minutes", type=float)
+    d.add_argument("--tickers", nargs="*")
 
     c = sub.add_parser("crawl")
     c.add_argument("--limit", type=int)
@@ -34,6 +62,7 @@ def main(argv=None):
     c.add_argument("--tickers", nargs="*")
 
     sub.add_parser("build")
+    sub.add_parser("report")
 
     dl = sub.add_parser("daily")
     dl.add_argument("--crawl-minutes", type=float, default=150)
@@ -45,18 +74,24 @@ def main(argv=None):
         n = universe.refresh(args.limit, args.tickers)
         print(f"universe: {n} listed companies")
     elif args.step == "discover":
-        n, found = discover.run(args.limit, args.retry_failed, args.minutes)
+        n, found = discover.run(args.limit, args.retry_failed, args.minutes, args.tickers)
         print(f"discover: {found}/{n} IR sites found")
     elif args.step == "crawl":
         n, new = crawl.run(args.limit, args.minutes, args.render, args.tickers)
         print(f"crawl: {n} companies crawled, {new} new webcasts")
     elif args.step == "build":
         print("build:", build.build())
+    elif args.step == "report":
+        report(store.load_watchlist())
     elif args.step == "daily":
-        print("universe:", universe.refresh())
-        print("discover:", discover.run(max_minutes=args.discover_minutes))
-        print("crawl:", crawl.run(max_minutes=args.crawl_minutes, render=not args.no_render))
+        tickers = store.load_watchlist()
+        if tickers:
+            print(f"watchlist: limiting this run to {len(tickers)} tickers")
+        print("universe:", universe.refresh(tickers=tickers))
+        print("discover:", discover.run(max_minutes=args.discover_minutes, tickers=tickers))
+        print("crawl:", crawl.run(max_minutes=args.crawl_minutes, render=not args.no_render, tickers=tickers))
         print("build:", build.build())
+        report(tickers)
     return 0
 
 

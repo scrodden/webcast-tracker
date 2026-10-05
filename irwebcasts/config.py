@@ -12,6 +12,8 @@ COMPANIES_FILE = DATA_DIR / "companies.json"
 WEBCASTS_FILE = DATA_DIR / "webcasts.json"
 OVERRIDES_FILE = DATA_DIR / "overrides.csv"
 CONFERENCE_ALIASES_FILE = DATA_DIR / "conference_aliases.json"
+# Tickers to limit every run to (one per line). Empty = the whole U.S. market.
+WATCHLIST_FILE = DATA_DIR / "watchlist.txt"
 
 USER_AGENT = os.environ.get(
     "IRW_USER_AGENT",

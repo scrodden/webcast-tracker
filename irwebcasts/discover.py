@@ -154,12 +154,14 @@ def discover_one(company, fetcher, search_key=None):
     return None, None
 
 
-def run(limit=None, retry_failed=False, max_minutes=None, fetcher=None):
+def run(limit=None, retry_failed=False, max_minutes=None, tickers=None, fetcher=None):
     search_key = os.environ.get("BRAVE_API_KEY") or None
     companies = store.load_companies()
+    wanted = {t.upper() for t in tickers} if tickers else None
     todo = [c for c in companies.values()
             if c.get("listed", True) and not c.get("ir_url")
-            and (retry_failed or not c.get("ir_checked"))]
+            and (wanted is None or wanted & set(c.get("tickers", [])))
+            and (retry_failed or wanted or not c.get("ir_checked"))]
     todo.sort(key=lambda c: -(c.get("market_cap") or 0))  # biggest companies first
     if limit:
         todo = todo[:limit]

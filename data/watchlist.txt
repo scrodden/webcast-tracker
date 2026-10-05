@@ -1,0 +1,12 @@
+# Pilot: while this file lists tickers, every run only handles these companies.
+# Delete the tickers (or the file) to cover every U.S.-listed company.
+NVDA
+AAPL
+MSFT
+GOOG
+LLY
+JNJ
+V
+MA
+UNH
+WMT
