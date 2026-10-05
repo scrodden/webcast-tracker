@@ -96,7 +96,8 @@ def candidates(domain):
     """Usual IR addresses on a company domain."""
     return [p.format(d=domain) for p in (
         "https://investors.{d}", "https://investor.{d}", "https://ir.{d}",
-        "https://stock.{d}", "https://www.{d}/investors", "https://www.{d}/investor-relations",
+        "https://stock.{d}", "https://www.{d}/investors", "https://www.{d}/investors.html",
+        "https://www.{d}/investor-relations", "https://www.{d}/investor-relations.html",
         "https://{d}/investors", "https://corporate.{d}/investors")]
 
 
