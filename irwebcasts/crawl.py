@@ -6,6 +6,7 @@ every page. Companies are processed oldest-crawl-first so a time-boxed
 scheduled run gradually covers the whole universe.
 """
 import os
+import re
 import threading
 import time
 from urllib.parse import urlsplit
@@ -53,6 +54,23 @@ class Renderer:
         self._pw.stop()
 
 
+_RANK = [(re.compile(r"event", re.I), -3), (re.compile(r"webcast", re.I), -3),
+         (re.compile(r"presentation", re.I), -2), (re.compile(r"calendar|conference", re.I), -2),
+         (re.compile(r"news|press|release|blog|stories", re.I), 2)]
+
+
+def events_rank(url):
+    """Lower = more likely to be the events/webcasts page (sort key, stable)."""
+    path = urlsplit(url).path
+    segments = [x for x in path.split("/") if x and not re.match(r"(default|index)\.\w+$", x)]
+    last = segments[-1] if segments else ""
+
+    def score(text):
+        return sum(weight for pattern, weight in _RANK if pattern.search(text))
+    # The last path segment says most about the page ("news-events/press-releases").
+    return 2 * score(last) + score(path)
+
+
 def crawl_company(company, fetcher, renderer=None):
     """Return [(webcast, source_page)] found on the company's IR site."""
     root = company["ir_url"]
@@ -64,9 +82,13 @@ def crawl_company(company, fetcher, renderer=None):
             return pages[url]
         resp = fetcher.get(url, retries=1)
         html = resp.text if resp is not None else None
-        # Many IR sites (e.g. Q4's) fill in their event lists with JavaScript.
-        if render and renderer is not None and (html is None or not extract_webcasts(html, url)):
-            html = renderer.html(url) or html
+        # Many IR sites (e.g. Q4's) fill in their event lists with JavaScript, often
+        # after showing one or two upcoming events in the page itself, so events
+        # pages are always also loaded in the browser and the fuller version kept.
+        if render and renderer is not None:
+            rendered = renderer.html(url)
+            if rendered and (html is None or len(extract_webcasts(rendered, url)) > len(extract_webcasts(html, url))):
+                html = rendered
         pages[url] = html
         return html
 
@@ -74,8 +96,9 @@ def crawl_company(company, fetcher, renderer=None):
     if home is None:
         return None
     # Events pages entered by hand (data/overrides.csv) come first.
-    listing = list(dict.fromkeys([root] + company.get("events_urls", []) + [
-        u for u in find_links(home, root, EVENTS_LINK_RE) if _site(u) == site]))
+    found = sorted((u for u in find_links(home, root, EVENTS_LINK_RE) if _site(u) == site),
+                   key=events_rank)
+    listing = list(dict.fromkeys([root] + company.get("events_urls", []) + found))
     detail = []
     for url in listing[:MAX_LISTING_PAGES]:
         html = fetch(url, render=url != root)
