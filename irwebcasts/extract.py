@@ -201,6 +201,8 @@ def _humanize(words):
     for w in words.split():
         if re.fullmatch(r"q\d|fy\d*", w, re.I):
             out.append(w.upper())
+        elif w.lower() in ("a", "an", "at", "to", "the", "of", "and", "for", "in", "on", "with", "date"):
+            out.append(w.lower())
         elif w.islower():
             out.append(w.capitalize())
         else:
@@ -214,10 +216,26 @@ def slug_title(url):
     for segment in reversed([x for x in urlsplit(url).path.split("/") if x]):
         if re.match(r"(?:default|index)\.", segment):
             continue
-        m = re.match(r"(.*?(?:earnings[-_]call|conference|investor[-_]day|annual[-_]meeting|summit|symposium|forum))",
-                     segment, re.I)
+        m = re.match(r"(.*?(?:earnings[-_]call|conference(?:[-_]call)?|investor[-_]day|annual[-_]meeting|"
+                     r"summit|symposium|forum|financial[-_]results))", segment, re.I)
         if m:
-            return _humanize(re.sub(r"[-_]+", " ", m.group(1)).strip())
+            # Addresses write "Communacopia + Technology" as "Communacopia--Technology".
+            words = re.sub(r"[-_]+", " ", m.group(1).replace("--", " + ")).strip()
+            return _event_name(_humanize(words)) or _humanize(words)
+    return ""
+
+
+def _event_name(text):
+    """The event inside a headline: 'Alphabet to Present at the Goldman Sachs 2026 Communacopia +
+    Technology Conference' → the conference; '… Date of First Quarter 2026 Financial Results
+    Conference Call' → 'First Quarter 2026 Earnings Call'."""
+    from .conferences import extract_conference_name
+    name = extract_conference_name(text)
+    if name:
+        return name
+    q = _QUARTER_RE.search(text)
+    if q and re.search(r"conference call|earnings|results", text, re.I):
+        return f"{q.group(1).strip().title()} Earnings Call"
     return ""
 
 
@@ -314,7 +332,6 @@ def announcement(html, url):
     Conference' … 'on Tuesday, September 8, 2026' → that conference on 2026-09-08,
     not the release's own date or its 'About Alphabet' boilerplate.
     """
-    from .conferences import extract_conference_name
     from .dates import find_event_date, find_all
     soup = BeautifulSoup(html, "lxml")
     for chrome in soup.find_all(["nav", "header", "footer", "script", "style"]):
@@ -326,11 +343,7 @@ def announcement(html, url):
     headline = _clean(h1.get_text(" ")) if h1 else ""
     if not headline or re.fullmatch(r"(?:news|press releases?|news releases?|news details)", headline, re.I):
         headline = slug_title(url) or headline
-    title = extract_conference_name(headline)
-    if not title:
-        q = _QUARTER_RE.search(headline)
-        if q and re.search(r"conference call|earnings|results", headline, re.I):
-            title = f"{q.group(1).strip().title()} Earnings Call"
+    title = _event_name(headline) or _event_name(slug_title(url))
     if not title:
         return None
     dates = find_all(text)

@@ -129,6 +129,18 @@ class AnnouncementTests(unittest.TestCase):
         self.assertEqual(w["date"], "2026-09-08")
 
 
+class SlugTitleTests(unittest.TestCase):
+    def test_headline_addresses_become_event_names(self):
+        from irwebcasts.extract import slug_title
+        base = "https://abc.xyz/investor/news/news-details/2026/"
+        self.assertEqual(slug_title(base + "Alphabet-to-Present-at-the-Goldman-Sachs-2026-Communacopia--Technology-"
+                                           "Conference-2026-9xibpppaLF/default.aspx"),
+                         "Goldman Sachs 2026 Communacopia + Technology Conference")
+        self.assertEqual(slug_title(base + "Alphabet-Announces-Date-of-First-Quarter-2026-Financial-Results-"
+                                           "Conference-Call-2026-x/default.aspx"),
+                         "First Quarter 2026 Earnings Call")
+
+
 class FakeResponse:
     def __init__(self, url, text):
         self.url, self.text = url, text
