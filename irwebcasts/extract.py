@@ -216,6 +216,8 @@ def extract_webcasts(html, base_url):
         if href.rstrip("/").lower() == base_url.rstrip("/").lower():
             continue
         title, date = _describe(a)
+        if is_youtube_video(href) and not date and not _LINK_TEXT_RE.search(_clean(a.get_text(" "))):
+            continue  # a corporate/marketing video rather than a streamed event
         found[href] = {"url": href, "title": title or title_from_url(href), "date": date}
     return list(found.values())
 
