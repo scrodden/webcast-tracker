@@ -221,7 +221,7 @@ def title_from_url(url):
     if m and "earning" in path:
         year, q = (m[1], m[2]) if m[1] else (m[4], m[3])
         year = year if len(year) == 4 else "20" + year
-        return f"{'FY ' if m[1] else ''}{year} Q{q} Earnings"
+        return f"{'FY ' if m[1] else ''}{year} Q{q} Earnings Call"
     return ""
 
 

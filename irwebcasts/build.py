@@ -4,17 +4,39 @@ The site is a handful of HTML pages plus compact JSON files they read, so the
 output stays small no matter how many companies we track (no per-company HTML).
 """
 import json
+import re
 import shutil
 from datetime import datetime, timezone
 
 from . import config, conferences, sectors, store
 
 
+def _event_key(w):
+    return (w["company_id"], re.sub(r"[^a-z0-9]", "", (w.get("title") or "").lower()))
+
+
+def dedupe(webcasts):
+    """One entry per company and event: when several links name the same event
+    (e.g. an events page and a press-release page for one earnings call), keep the
+    direct webcast player first, then a dated entry, then the earliest found."""
+    from .extract import is_webcast_url
+    best = {}
+    for w in webcasts:
+        key = _event_key(w)
+        if not key[1]:
+            best[w["id"]] = w
+            continue
+        rank = (not is_webcast_url(w["url"]), w.get("date") is None, w.get("first_seen") or "")
+        if key not in best or rank < best[key][0]:
+            best[key] = (rank, w)
+    return [v[1] if isinstance(v, tuple) else v for v in best.values()]
+
+
 def build(out_dir=None):
     out = out_dir or config.SITE_DIR
     companies = store.load_companies()
     webcasts = list(store.load_webcasts().values())
-    webcasts = [w for w in webcasts if w["company_id"] in companies]
+    webcasts = dedupe([w for w in webcasts if w["company_id"] in companies])
     confs = conferences.build(webcasts, companies)
 
     counts = {}

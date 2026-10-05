@@ -87,6 +87,17 @@ def upsert_webcast(webcasts, company_id, url, title, date, source, source_url, k
     return True
 
 
+def prune_stale(webcasts, company_id, found_urls):
+    """After a successful crawl, forget links to the company's own pages that the
+    crawler no longer accepts (left over from older, looser rules). Links to webcast
+    players are kept as history even once they drop off the IR site."""
+    from .extract import is_webcast_url
+    for wid, w in list(webcasts.items()):
+        if (w["company_id"] == company_id and w["source"] == "ir-page"
+                and w["url"] not in found_urls and not is_webcast_url(w["url"])):
+            del webcasts[wid]
+
+
 def load_overrides():
     """Manual corrections keyed by ticker: ir_url, website, sector."""
     if not config.OVERRIDES_FILE.exists():

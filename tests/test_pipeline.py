@@ -60,7 +60,7 @@ class NoiseTests(unittest.TestCase):
         found = extract_webcasts(html, "https://www.microsoft.com/en-us/investor/default")
         self.assertEqual([(w["url"], w["title"]) for w in found], [
             ("https://www.microsoft.com/en-us/investor/earnings/fy-2026-q4/press-release-webcast",
-             "FY 2026 Q4 Earnings")])
+             "FY 2026 Q4 Earnings Call")])
 
 
 class YouTubeTests(unittest.TestCase):
@@ -85,6 +85,20 @@ class UnwrapTests(unittest.TestCase):
         wrapped = ("https://urldefense.com/v3/__https:/cc.webcasts.com/gold006/091426a_js/?entity=24_7NURBBQ"
                    "__;!!IfjTnhH9!WcYvsRg4a$")
         self.assertEqual(unwrap(wrapped), "https://cc.webcasts.com/gold006/091426a_js/?entity=24_7NURBBQ")
+
+
+class DedupeTests(unittest.TestCase):
+    def test_same_event_via_several_links_is_listed_once(self):
+        from irwebcasts.build import dedupe
+        rows = [
+            {"id": "1", "company_id": "us-msft", "title": "FY 2026 Q4 Earnings Call", "date": None,
+             "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2026-q4/press-release-webcast"},
+            {"id": "2", "company_id": "us-msft", "title": "FY 2026 Q4 Earnings Call", "date": "2026-07-29",
+             "url": "https://www.microsoft.com/en-us/investor/events/fy-2026/earnings-fy-2026-q4"},
+            {"id": "3", "company_id": "us-lly", "title": "FY 2026 Q4 Earnings Call", "date": None,
+             "url": "https://edge.media-server.com/mmc/p/x"},
+        ]
+        self.assertEqual(sorted(w["id"] for w in dedupe(rows)), ["2", "3"])
 
 
 class FakeResponse:

@@ -168,6 +168,8 @@ def run(limit=None, max_minutes=None, render=False, tickers=None, fetcher=None):
                     for w, page in found or []:
                         counts["new"] += store.upsert_webcast(webcasts, company["id"], w["url"], w["title"],
                                                               w["date"], "ir-page", page)
+                    if found is not None:
+                        store.prune_stale(webcasts, company["id"], {w["url"] for w, _ in found})
                     counts["crawled"] += 1
                     if counts["crawled"] % 50 == 0:
                         store.save_companies(companies)
