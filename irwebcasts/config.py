@@ -19,8 +19,11 @@ USER_AGENT = os.environ.get(
 )
 
 # Data APIs (not web pages), so robots.txt doesn't apply to them.
-API_HOSTS = ("api.nasdaq.com", "www.nasdaqtrader.com", "api.search.brave.com")
+API_HOSTS = ("api.nasdaq.com", "www.nasdaqtrader.com", "api.search.brave.com",
+             "query.wikidata.org", "raw.githubusercontent.com")
 
 # Seconds between requests to the same host.
 SITE_DELAY = 1.0
-TIMEOUT = 20
+TIMEOUT = 15
+# Parallel workers for discover/crawl; each works on a different company site.
+WORKERS = 8

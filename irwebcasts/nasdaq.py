@@ -2,8 +2,8 @@
 
 * Symbol directory (nasdaqtrader.com): the official daily list of every security
   on Nasdaq, NYSE, NYSE American and Cboe, published for download.
-* Stock screener (api.nasdaq.com): sector, industry and market cap for each stock.
-* Company profile (api.nasdaq.com): the company's own website.
+* Stock screener (api.nasdaq.com, or a public daily copy of it): sector, industry
+  and market cap for each stock.
 """
 import csv
 import io
@@ -12,7 +12,12 @@ import re
 NASDAQ_LISTED_URL = "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt"
 OTHER_LISTED_URL = "https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt"
 SCREENER_URL = "https://api.nasdaq.com/api/screener/stocks?tableonly=true&download=true"
-PROFILE_URL = "https://api.nasdaq.com/api/company/{symbol}/company-profile"
+# api.nasdaq.com often refuses cloud servers, so read a public daily copy of the
+# same screener data first (github.com/rreichel3/US-Stock-Symbols).
+SCREENER_MIRRORS = [
+    f"https://raw.githubusercontent.com/rreichel3/US-Stock-Symbols/main/{x}/{x}_full_tickers.json"
+    for x in ("nasdaq", "nyse", "amex")
+]
 
 # api.nasdaq.com only answers requests that look like they come from nasdaq.com.
 API_HEADERS = {
@@ -104,12 +109,12 @@ def parse_screener(payload):
     return out
 
 
-def parse_profile(payload):
-    """Company website from the company-profile JSON, or None."""
-    data = (payload or {}).get("data") or {}
-    for key, field in data.items():
-        if "url" in key.lower() or "website" in key.lower():
-            value = field.get("value") if isinstance(field, dict) else field
-            if isinstance(value, str) and "." in value and "nasdaq.com" not in value:
-                return value.strip()
-    return None
+def fetch_screener(fetcher):
+    rows = []
+    for url in SCREENER_MIRRORS:
+        data = fetcher.get_json(url, retries=1)
+        if isinstance(data, list):
+            rows += data
+    if rows:
+        return parse_screener({"data": {"rows": rows}})
+    return parse_screener(fetcher.get_json(SCREENER_URL, headers=API_HEADERS, retries=0, timeout=20))

@@ -1,10 +1,11 @@
 import sys
 import unittest
+from unittest import mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from irwebcasts import conferences, nasdaq  # noqa: E402
+from irwebcasts import conferences, discover, nasdaq, wikidata  # noqa: E402
 from irwebcasts.crawl import crawl_company  # noqa: E402
 from irwebcasts.dates import find_date  # noqa: E402
 from irwebcasts.discover import pick_domain  # noqa: E402
@@ -38,6 +39,14 @@ class ExtractTests(unittest.TestCase):
         self.assertIn("Morgan Stanley", ms["title"])
 
 
+class Q4LayoutTests(unittest.TestCase):
+    def test_section_labels_are_not_titles(self):
+        html = (FIXTURES / "q4_events.html").read_text()
+        [w] = extract_webcasts(html, "https://investor.atmeta.com/investor-events/default.aspx")
+        self.assertEqual(w["title"], "Q3 2026 Earnings Call")
+        self.assertEqual(w["date"], "2026-10-28")
+
+
 class FakeResponse:
     def __init__(self, url, text):
         self.url, self.text = url, text
@@ -47,7 +56,7 @@ class FakeFetcher:
     def __init__(self, pages):
         self.pages, self.requested = pages, []
 
-    def get(self, url):
+    def get(self, url, **kwargs):
         self.requested.append(url)
         return FakeResponse(url, self.pages[url]) if url in self.pages else None
 
@@ -107,10 +116,30 @@ File Creation Time: 1005202615:00|||||||
         self.assertEqual(screener["AAPL"]["sector"], "Information Technology")
         self.assertEqual(screener["AAPL"]["market_cap"], 3.5e12)
         self.assertEqual(screener["BRK.B"]["sector"], "Financials")
-        profile = {"data": {"CompanyName": {"value": "Apple Inc."},
-                            "CompanyUrl": {"label": "Company Url", "value": "https://www.apple.com"}}}
-        self.assertEqual(nasdaq.parse_profile(profile), "https://www.apple.com")
         self.assertEqual(pick_domain({"website": "https://www.apple.com"}), "apple.com")
+
+    def test_wikidata_websites(self):
+        payload = {"results": {"bindings": [
+            {"ticker": {"value": "BRK.B"}, "website": {"value": "https://www.berkshirehathaway.com"}},
+            {"ticker": {"value": "AAPL"}, "website": {"value": "https://www.apple.com/"}}]}}
+        sites = wikidata.parse(payload)
+        self.assertEqual(sites[wikidata.normalize_ticker("BRK-B")], "https://www.berkshirehathaway.com")
+        self.assertEqual(sites["AAPL"], "https://www.apple.com/")
+
+
+class SearchTests(unittest.TestCase):
+    def test_ddg_results_and_company_match(self):
+        html = """<div class="result"><a class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Finvestor.atmeta.com%2F&rut=x">Meta IR</a></div>
+                  <div class="result"><a class="result__a" href="https://finance.yahoo.com/quote/META">Yahoo</a></div>
+                  <div class="result"><a class="result__a" href="https://investor.otherco.com/">Other</a></div>"""
+        self.assertEqual(discover.parse_ddg(html)[0], "https://investor.atmeta.com/")
+        with mock.patch.object(discover, "_search_results", lambda q, f, k: discover.parse_ddg(html)):
+            found = discover.search({"name": "Meta Platforms, Inc.", "tickers": ["META"]}, None)
+        self.assertEqual(found, ["https://investor.atmeta.com/"])
+
+    def test_guess_domains(self):
+        self.assertEqual(discover.guess_domains({"name": "Agilent Technologies, Inc."}),
+                         ["agilent.com", "agilenttechnologies.com"])
 
 
 class ConferenceTests(unittest.TestCase):

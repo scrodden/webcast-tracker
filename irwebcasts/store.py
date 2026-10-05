@@ -61,10 +61,10 @@ def upsert_webcast(webcasts, company_id, url, title, date, source, source_url):
     existing = webcasts.get(wid)
     if existing:
         existing["last_seen"] = seen
-        # Prefer a descriptive title/date over a blank one from a later pass.
-        if title and not existing.get("title"):
+        # Later passes may read the page better (e.g. after a parser fix).
+        if title:
             existing["title"] = title
-        if date and not existing.get("date"):
+        if date:
             existing["date"] = date
         return False
     webcasts[wid] = {

@@ -11,7 +11,7 @@ on:
     inputs:
       crawl_minutes:
         description: "Minutes to spend crawling IR sites"
-        default: "200"
+        default: "150"
 
 permissions:
   contents: write
@@ -25,8 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 340
     env:
-      # Optional: a Brave Search API key lets the crawler search
-      # "<company> investor relations" for companies it can't find otherwise.
+      # Optional: a Brave Search API key is used instead of DuckDuckGo for
+      # "<company> investor relations" searches.
       BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +36,9 @@ jobs:
           python-version: "3.12"
 
       - name: Install
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
 
       - name: Test
         run: python -m unittest discover -s tests
@@ -44,9 +46,11 @@ jobs:
       - name: Collect and build
         run: |
           python -m irwebcasts daily \
-            --crawl-minutes "${{ github.event.inputs.crawl_minutes || '200' }}"
+            --crawl-minutes "${{ github.event.inputs.crawl_minutes || '150' }}"
 
       - name: Commit
+        # Save whatever was collected even if the run stopped partway.
+        if: ${{ !cancelled() }}
         run: |
           git config user.name "webcast-tracker-bot"
           git config user.email "webcast-tracker-bot@users.noreply.github.com"

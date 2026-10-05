@@ -44,7 +44,7 @@ class Fetcher:
             self._robots[root] = rp
         return self._robots[root].can_fetch(self.user_agent, url)
 
-    def get(self, url, retries=2, **kwargs):
+    def get(self, url, retries=2, timeout=config.TIMEOUT, **kwargs):
         """Return a Response, or None when blocked, missing or unreachable."""
         if not self.allowed(url):
             return None
@@ -52,14 +52,15 @@ class Fetcher:
         for attempt in range(retries + 1):
             self._wait(host)
             try:
-                resp = self.session.get(url, timeout=config.TIMEOUT, **kwargs)
+                resp = self.session.get(url, timeout=timeout, **kwargs)
             except requests.RequestException:
                 resp = None
             if resp is not None and resp.status_code < 400:
                 return resp
             if resp is not None and resp.status_code not in (429, 500, 502, 503, 504):
                 return None
-            time.sleep(2 ** attempt * 2)
+            if attempt < retries:
+                time.sleep(2 ** attempt * 2)
         return None
 
     def get_json(self, url, **kwargs):

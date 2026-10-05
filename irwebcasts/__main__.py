@@ -36,8 +36,9 @@ def main(argv=None):
     sub.add_parser("build")
 
     dl = sub.add_parser("daily")
-    dl.add_argument("--crawl-minutes", type=float, default=200)
-    dl.add_argument("--discover-minutes", type=float, default=45)
+    dl.add_argument("--crawl-minutes", type=float, default=150)
+    dl.add_argument("--discover-minutes", type=float, default=150)
+    dl.add_argument("--no-render", action="store_true", help="skip the headless browser")
 
     args = p.parse_args(argv)
     if args.step == "universe":
@@ -54,7 +55,7 @@ def main(argv=None):
     elif args.step == "daily":
         print("universe:", universe.refresh())
         print("discover:", discover.run(max_minutes=args.discover_minutes))
-        print("crawl:", crawl.run(max_minutes=args.crawl_minutes))
+        print("crawl:", crawl.run(max_minutes=args.crawl_minutes, render=not args.no_render))
         print("build:", build.build())
     return 0
 

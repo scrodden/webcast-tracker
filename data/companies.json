@@ -3,11 +3,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-a",
-  "ir_checked": "2026-10-05T16:38:12Z",
   "listed": true,
   "market_cap": 0,
   "name": "Agilent Technologies, Inc.",
-  "profile_checked": "2026-10-05T16:38:12Z",
   "sector": "Other",
   "tickers": [
    "A"
@@ -17,11 +15,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-aa",
-  "ir_checked": "2026-10-05T16:39:26Z",
   "listed": true,
   "market_cap": 0,
   "name": "Alcoa Corporation",
-  "profile_checked": "2026-10-05T16:39:26Z",
   "sector": "Other",
   "tickers": [
    "AA"
@@ -31,11 +27,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-aac",
-  "ir_checked": "2026-10-05T16:40:41Z",
   "listed": true,
   "market_cap": 0,
   "name": "Ares Acquisition Corporation III",
-  "profile_checked": "2026-10-05T16:40:41Z",
   "sector": "Other",
   "tickers": [
    "AAC"
@@ -45,11 +39,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-aaci",
-  "ir_checked": "2026-10-05T16:41:55Z",
   "listed": true,
   "market_cap": 0,
   "name": "Armada Acquisition Corp. III",
-  "profile_checked": "2026-10-05T16:41:55Z",
   "sector": "Other",
   "tickers": [
    "AACI"
@@ -59,11 +51,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-aaco",
-  "ir_checked": "2026-10-05T16:43:09Z",
   "listed": true,
   "market_cap": 0,
   "name": "Abony Acquisition Corp. I",
-  "profile_checked": "2026-10-05T16:43:09Z",
   "sector": "Other",
   "tickers": [
    "AACO"
@@ -73,11 +63,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-aacp",
-  "ir_checked": "2026-10-05T16:44:23Z",
   "listed": true,
   "market_cap": 0,
   "name": "Apogee Acquisition Corp",
-  "profile_checked": "2026-10-05T16:44:23Z",
   "sector": "Other",
   "tickers": [
    "AACP"
@@ -87,11 +75,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-aadx",
-  "ir_checked": "2026-10-05T16:45:37Z",
   "listed": true,
   "market_cap": 0,
   "name": "Applied Aerospace & Defense, Inc.",
-  "profile_checked": "2026-10-05T16:45:37Z",
   "sector": "Other",
   "tickers": [
    "AADX"
@@ -101,11 +87,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-aal",
-  "ir_checked": "2026-10-05T16:46:52Z",
   "listed": true,
   "market_cap": 0,
   "name": "American Airlines Group, Inc.",
-  "profile_checked": "2026-10-05T16:46:52Z",
   "sector": "Other",
   "tickers": [
    "AAL"
@@ -115,11 +99,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-aame",
-  "ir_checked": "2026-10-05T16:48:08Z",
   "listed": true,
   "market_cap": 0,
   "name": "Atlantic American Corporation",
-  "profile_checked": "2026-10-05T16:48:08Z",
   "sector": "Other",
   "tickers": [
    "AAME"
@@ -129,11 +111,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-aami",
-  "ir_checked": "2026-10-05T16:49:22Z",
   "listed": true,
   "market_cap": 0,
   "name": "Acadian Asset Management Inc.",
-  "profile_checked": "2026-10-05T16:49:22Z",
   "sector": "Other",
   "tickers": [
    "AAMI"
@@ -143,11 +123,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-aaoi",
-  "ir_checked": "2026-10-05T16:50:36Z",
   "listed": true,
   "market_cap": 0,
   "name": "Applied Optoelectronics, Inc.",
-  "profile_checked": "2026-10-05T16:50:36Z",
   "sector": "Other",
   "tickers": [
    "AAOI"
@@ -157,11 +135,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-aaon",
-  "ir_checked": "2026-10-05T16:51:50Z",
   "listed": true,
   "market_cap": 0,
   "name": "AAON, Inc.",
-  "profile_checked": "2026-10-05T16:51:50Z",
   "sector": "Other",
   "tickers": [
    "AAON"
@@ -171,11 +147,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-aap",
-  "ir_checked": "2026-10-05T16:53:05Z",
   "listed": true,
   "market_cap": 0,
   "name": "Advance Auto Parts Inc.",
-  "profile_checked": "2026-10-05T16:53:05Z",
   "sector": "Other",
   "tickers": [
    "AAP"
@@ -185,11 +159,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-aapg",
-  "ir_checked": "2026-10-05T16:54:19Z",
   "listed": true,
   "market_cap": 0,
   "name": "Ascentage Pharma Group International",
-  "profile_checked": "2026-10-05T16:54:19Z",
   "sector": "Other",
   "tickers": [
    "AAPG"
@@ -199,11 +171,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-aapl",
-  "ir_checked": "2026-10-05T16:55:33Z",
   "listed": true,
   "market_cap": 0,
   "name": "Apple Inc.",
-  "profile_checked": "2026-10-05T16:55:33Z",
   "sector": "Other",
   "tickers": [
    "AAPL"
@@ -213,11 +183,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-aard",
-  "ir_checked": "2026-10-05T16:56:47Z",
   "listed": true,
   "market_cap": 0,
   "name": "Aardvark Therapeutics, Inc.",
-  "profile_checked": "2026-10-05T16:56:47Z",
   "sector": "Other",
   "tickers": [
    "AARD"
@@ -227,11 +195,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-aat",
-  "ir_checked": "2026-10-05T16:58:01Z",
   "listed": true,
   "market_cap": 0,
   "name": "American Assets Trust, Inc.",
-  "profile_checked": "2026-10-05T16:58:01Z",
   "sector": "Other",
   "tickers": [
    "AAT"
@@ -241,11 +207,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-aauc",
-  "ir_checked": "2026-10-05T16:59:15Z",
   "listed": true,
   "market_cap": 0,
   "name": "Allied Gold Corporation",
-  "profile_checked": "2026-10-05T16:59:15Z",
   "sector": "Other",
   "tickers": [
    "AAUC"
@@ -255,11 +219,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-abat",
-  "ir_checked": "2026-10-05T17:00:30Z",
   "listed": true,
   "market_cap": 0,
   "name": "American Battery Technology Company",
-  "profile_checked": "2026-10-05T17:00:30Z",
   "sector": "Other",
   "tickers": [
    "ABAT"
@@ -269,11 +231,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-abbv",
-  "ir_checked": "2026-10-05T17:01:44Z",
   "listed": true,
   "market_cap": 0,
   "name": "AbbVie Inc.",
-  "profile_checked": "2026-10-05T17:01:44Z",
   "sector": "Other",
   "tickers": [
    "ABBV"
@@ -283,11 +243,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-abcb",
-  "ir_checked": "2026-10-05T17:02:58Z",
   "listed": true,
   "market_cap": 0,
   "name": "Ameris Bancorp",
-  "profile_checked": "2026-10-05T17:02:58Z",
   "sector": "Other",
   "tickers": [
    "ABCB"
@@ -297,11 +255,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-abcl",
-  "ir_checked": "2026-10-05T17:04:12Z",
   "listed": true,
   "market_cap": 0,
   "name": "AbCellera Biologics Inc.",
-  "profile_checked": "2026-10-05T17:04:12Z",
   "sector": "Other",
   "tickers": [
    "ABCL"
@@ -311,11 +267,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-abeo",
-  "ir_checked": "2026-10-05T17:05:27Z",
   "listed": true,
   "market_cap": 0,
   "name": "Abeona Therapeutics Inc.",
-  "profile_checked": "2026-10-05T17:05:27Z",
   "sector": "Other",
   "tickers": [
    "ABEO"
@@ -325,11 +279,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-abev",
-  "ir_checked": "2026-10-05T17:06:41Z",
   "listed": true,
   "market_cap": 0,
   "name": "Ambev S.A.",
-  "profile_checked": "2026-10-05T17:06:41Z",
   "sector": "Other",
   "tickers": [
    "ABEV"
@@ -339,11 +291,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-abg",
-  "ir_checked": "2026-10-05T17:07:55Z",
   "listed": true,
   "market_cap": 0,
   "name": "Asbury Automotive Group Inc",
-  "profile_checked": "2026-10-05T17:07:55Z",
   "sector": "Other",
   "tickers": [
    "ABG"
@@ -353,11 +303,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-ablv",
-  "ir_checked": "2026-10-05T17:09:09Z",
   "listed": true,
   "market_cap": 0,
   "name": "Able View Global Inc.",
-  "profile_checked": "2026-10-05T17:09:09Z",
   "sector": "Other",
   "tickers": [
    "ABLV"
@@ -367,11 +315,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-abm",
-  "ir_checked": "2026-10-05T17:10:23Z",
   "listed": true,
   "market_cap": 0,
   "name": "ABM Industries Incorporated",
-  "profile_checked": "2026-10-05T17:10:23Z",
   "sector": "Other",
   "tickers": [
    "ABM"
@@ -381,11 +327,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-abnb",
-  "ir_checked": "2026-10-05T17:11:37Z",
   "listed": true,
   "market_cap": 0,
   "name": "Airbnb, Inc.",
-  "profile_checked": "2026-10-05T17:11:37Z",
   "sector": "Other",
   "tickers": [
    "ABNB"
@@ -395,11 +339,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-abos",
-  "ir_checked": "2026-10-05T17:12:52Z",
   "listed": true,
   "market_cap": 0,
   "name": "Acumen Pharmaceuticals, Inc.",
-  "profile_checked": "2026-10-05T17:12:52Z",
   "sector": "Other",
   "tickers": [
    "ABOS"
@@ -409,11 +351,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-abr",
-  "ir_checked": "2026-10-05T17:14:06Z",
   "listed": true,
   "market_cap": 0,
   "name": "Arbor Realty Trust",
-  "profile_checked": "2026-10-05T17:14:06Z",
   "sector": "Other",
   "tickers": [
    "ABR"
@@ -423,11 +363,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-absi",
-  "ir_checked": "2026-10-05T17:15:20Z",
   "listed": true,
   "market_cap": 0,
   "name": "Absci Corporation",
-  "profile_checked": "2026-10-05T17:15:20Z",
   "sector": "Other",
   "tickers": [
    "ABSI"
@@ -437,11 +375,9 @@
   "country": "US",
   "exchange": "NYSE",
   "id": "us-abt",
-  "ir_checked": "2026-10-05T17:16:34Z",
   "listed": true,
   "market_cap": 0,
   "name": "Abbott Laboratories",
-  "profile_checked": "2026-10-05T17:16:34Z",
   "sector": "Other",
   "tickers": [
    "ABT"
@@ -451,11 +387,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-abtc",
-  "ir_checked": "2026-10-05T17:17:48Z",
   "listed": true,
   "market_cap": 0,
   "name": "American Bitcoin Corp.",
-  "profile_checked": "2026-10-05T17:17:48Z",
   "sector": "Other",
   "tickers": [
    "ABTC"
@@ -465,11 +399,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-abts",
-  "ir_checked": "2026-10-05T17:19:03Z",
   "listed": true,
   "market_cap": 0,
   "name": "Abits Group Inc",
-  "profile_checked": "2026-10-05T17:19:03Z",
   "sector": "Other",
   "tickers": [
    "ABTS"
@@ -479,11 +411,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-abus",
-  "ir_checked": "2026-10-05T17:20:17Z",
   "listed": true,
   "market_cap": 0,
   "name": "Arbutus Biopharma Corporation",
-  "profile_checked": "2026-10-05T17:20:17Z",
   "sector": "Other",
   "tickers": [
    "ABUS"
@@ -493,11 +423,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-abvc",
-  "ir_checked": "2026-10-05T17:21:31Z",
   "listed": true,
   "market_cap": 0,
   "name": "ABVC BioPharma, Inc.",
-  "profile_checked": "2026-10-05T17:21:31Z",
   "sector": "Other",
   "tickers": [
    "ABVC"
@@ -507,11 +435,9 @@
   "country": "US",
   "exchange": "Nasdaq",
   "id": "us-abvx",
-  "ir_checked": "2026-10-05T17:22:45Z",
   "listed": true,
   "market_cap": 0,
   "name": "Abivax SA",
-  "profile_checked": "2026-10-05T17:22:45Z",
   "sector": "Other",
   "tickers": [
    "ABVX"

@@ -44,7 +44,9 @@ _GENERIC = re.compile(
     r"click here|here|audio|presentation|slides|transcript|event details|details|more|"
     r"register|add to calendar|download|pdf|play|archive|archived webcast|upcoming events?|"
     r"past events?|events?|and presentations|events & presentations|events and presentations|"
-    r"read more|learn more|\W*)$",
+    r"read more|learn more|documents?|materials?|event materials|presentation materials|resources|"
+    r"downloads?|supplemental (?:information|materials)|related (?:documents|materials)|media|"
+    r"audio webcast|video webcast|webcast & presentation|webcast and presentation|\W*)$",
     re.I)
 
 _CONTAINERS = {"li", "tr", "article", "section", "div", "dd", "td", "p"}
@@ -88,7 +90,7 @@ def _event_blocks(a):
         if len(text) < 12:
             continue
         # Stop before climbing into a list that holds several events.
-        if len(text) > 600 or _count_webcast_links(node) > 3:
+        if len(text) > 1500 or _count_webcast_links(node) > 3:
             return
         yield node
 

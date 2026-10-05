@@ -1,12 +1,14 @@
 """Build the company universe from Nasdaq's public symbol directory.
 
+Websites come from Wikidata (see wikidata.py).
+
 Share classes of one company (GOOGL/GOOG, BRK.A/BRK.B) are grouped by company
 name. Sector, industry and market cap come from Nasdaq's stock screener; if
 that call fails the universe still updates and sectors fill in next time.
 """
 import re
 
-from . import nasdaq, store
+from . import nasdaq, store, wikidata
 from .http import Fetcher
 
 
@@ -25,9 +27,9 @@ def refresh(limit=None, tickers=None, fetcher=None):
     if listed is None or other is None:
         raise SystemExit("Could not download Nasdaq's symbol directory")
     securities = nasdaq.parse_symbol_files(listed.text, other.text)
-    screener = nasdaq.parse_screener(fetcher.get_json(nasdaq.SCREENER_URL, headers=nasdaq.API_HEADERS))
-    if not screener:
-        print("warning: Nasdaq screener unavailable; sectors not updated this run")
+    screener = nasdaq.fetch_screener(fetcher)
+    websites = wikidata.fetch_websites(fetcher)
+    print(f"universe: {len(securities)} securities, sectors for {len(screener)}, websites for {len(websites)}")
 
     groups = {}
     for sec in securities:
@@ -59,6 +61,9 @@ def refresh(limit=None, tickers=None, fetcher=None):
             company["sector"] = info["sector"]
             company["industry"] = info["industry"]
         company.setdefault("sector", "Other")
+        site = next((websites[w] for w in map(wikidata.normalize_ticker, symbols) if w in websites), None)
+        if site and company.get("website_source") != "override":
+            company["website"] = site
         for t in symbols:
             if t in overrides:
                 _apply_override(company, overrides[t])
@@ -83,6 +88,7 @@ def _apply_override(company, override):
         company["sector"] = override["sector"]
     if override.get("website"):
         company["website"] = override["website"]
+        company["website_source"] = "override"
     if override.get("ir_url"):
         company["ir_url"] = override["ir_url"]
         company["ir_source"] = "override"
