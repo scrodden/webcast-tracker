@@ -60,6 +60,19 @@ EVENTS_LINK_RE = re.compile(
 EVENT_DETAIL_RE = re.compile(r"event[-_]?details?|/events?/(?:detail|\d)|eventid=|/event/", re.I)
 
 
+def is_youtube_video(url):
+    """A YouTube video or livestream (not a channel link from a social-media footer)."""
+    parts = urlsplit(url)
+    host = parts.netloc.lower().removeprefix("www.").removeprefix("m.")
+    if host == "youtu.be":
+        return len(parts.path) > 1
+    if host in ("youtube.com", "youtube-nocookie.com"):
+        if parts.path == "/watch":
+            return "v=" in parts.query
+        return parts.path.startswith(("/live/", "/embed/")) and len(parts.path) > 7
+    return False
+
+
 def is_webcast_url(url):
     parts = urlsplit(url)
     host = parts.netloc.lower()
@@ -69,6 +82,8 @@ def is_webcast_url(url):
         return False  # a provider's home page, not an event
     if "/analyst/" in parts.path or "pwd=" in parts.query:
         return False  # Q&A access for sell-side participants
+    if is_youtube_video(url):
+        return True
     return any(host == h or host.endswith("." + h) for h in WEBCAST_HOSTS)
 
 
@@ -184,8 +199,13 @@ def extract_webcasts(html, base_url):
     """Return [{url, title, date}] for every webcast link on the page."""
     soup = BeautifulSoup(html, "lxml")
     found = {}
-    for a in soup.find_all("a", href=True):
-        href = urljoin(base_url, a["href"].strip())
+    for a in soup.find_all(["a", "iframe"]):
+        raw = a.get("href") if a.name == "a" else a.get("src")
+        if not raw:
+            continue
+        if a.name == "iframe" and not is_webcast_url(urljoin(base_url, raw.strip())):
+            continue
+        href = urljoin(base_url, raw.strip())
         if "#" in href:
             page, _, _ = href.partition("#")
             if page.rstrip("/").lower() == base_url.split("#")[0].rstrip("/").lower():

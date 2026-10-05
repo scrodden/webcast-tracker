@@ -63,6 +63,22 @@ class NoiseTests(unittest.TestCase):
              "Earnings Release FY26 Q4")])
 
 
+class YouTubeTests(unittest.TestCase):
+    def test_streams_count_but_channel_links_do_not(self):
+        html = """<html><body>
+          <div class="event"><h3>Q3 2026 Earnings Call</h3><p>October 27, 2026</p>
+            <a href="https://www.youtube.com/watch?v=abc123XYZ">Watch</a></div>
+          <div class="event"><h3>Annual Meeting of Stockholders</h3><p>June 5, 2026</p>
+            <iframe src="https://www.youtube.com/embed/def456"></iframe></div>
+          <footer><a href="https://www.youtube.com/user/Google">YouTube</a></footer>
+        </body></html>"""
+        found = {w["url"]: w for w in extract_webcasts(html, "https://abc.xyz/investor/")}
+        self.assertEqual(set(found), {"https://www.youtube.com/watch?v=abc123XYZ",
+                                      "https://www.youtube.com/embed/def456"})
+        self.assertEqual(found["https://www.youtube.com/watch?v=abc123XYZ"]["title"], "Q3 2026 Earnings Call")
+        self.assertEqual(found["https://www.youtube.com/embed/def456"]["date"], "2026-06-05")
+
+
 class FakeResponse:
     def __init__(self, url, text):
         self.url, self.text = url, text
