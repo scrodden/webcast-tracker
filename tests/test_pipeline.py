@@ -100,6 +100,16 @@ class DedupeTests(unittest.TestCase):
         ]
         self.assertEqual(sorted(w["id"] for w in dedupe(rows)), ["2", "3"])
 
+    def test_earnings_calls_worded_differently_are_one_event(self):
+        from irwebcasts.build import dedupe
+        rows = [
+            {"id": "a", "company_id": "us-googl", "title": "2026 Q1 Earnings Call", "date": None,
+             "url": "https://abc.xyz/investor/events/event-details/2026/2026-Q1-Earnings-Call/default.aspx"},
+            {"id": "b", "company_id": "us-googl", "title": "First Quarter 2026 Earnings Call", "date": "2026-04-29",
+             "url": "https://www.youtube.com/watch?v=LPJoiDiVkTI"},
+        ]
+        self.assertEqual([w["id"] for w in dedupe(rows)], ["b"])
+
 
 class InstructionTitleTests(unittest.TestCase):
     def test_instructions_are_not_titles(self):

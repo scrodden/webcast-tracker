@@ -11,8 +11,21 @@ from datetime import datetime, timezone
 from . import config, conferences, sectors, store
 
 
+_QUARTERS = {"first": "1", "second": "2", "third": "3", "fourth": "4", "1st": "1", "2nd": "2", "3rd": "3", "4th": "4"}
+
+
 def _event_key(w):
-    return (w["company_id"], re.sub(r"[^a-z0-9]", "", (w.get("title") or "").lower()))
+    """Same company + same event. Earnings calls written differently ('First Quarter
+    2026 Earnings Call', '2026 Q1 Earnings Call', 'Q1 2026 Earnings Call') share a key."""
+    title = (w.get("title") or "").lower()
+    if "earnings" in title or "results" in title:
+        fy = "fy" if re.search(r"\bfy|fiscal", title) else ""
+        q = re.search(r"\bq([1-4])\b", title) or re.search(r"\b(first|second|third|fourth|1st|2nd|3rd|4th)[- ]quarter", title)
+        y = re.search(r"\b(20\d\d)\b", title)
+        if q and y:
+            quarter = _QUARTERS.get(q.group(1), q.group(1))
+            return (w["company_id"], f"earnings-{fy}{y.group(1)}-q{quarter}")
+    return (w["company_id"], re.sub(r"[^a-z0-9]", "", title))
 
 
 def dedupe(webcasts):
