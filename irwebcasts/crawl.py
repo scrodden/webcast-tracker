@@ -12,11 +12,13 @@ import time
 from urllib.parse import urlsplit
 
 from . import config, store
-from .extract import EVENT_DETAIL_RE, EVENTS_LINK_RE, announcement, extract_webcasts, find_links, page_heading
+from .extract import (ANNOUNCEMENT_LINK_RE, EVENT_DETAIL_RE, EVENTS_LINK_RE, announced_event, announcement,
+                      extract_webcasts, find_links, page_heading)
 from .http import Fetcher
 
 MAX_LISTING_PAGES = 6
 MAX_DETAIL_PAGES = 25
+MAX_ANNOUNCEMENTS = 6
 
 
 def _site(url):
@@ -77,6 +79,11 @@ def events_rank(url):
     return 2 * score(last) + score(path)
 
 
+def _is_challenge(html):
+    """A bot-check interstitial (e.g. Cloudflare's 'Just a moment...') rather than the page."""
+    return "<title>Just a moment...</title>" in html or "Performing security verification" in html
+
+
 def _with_announcement(webcasts, html, url):
     """On a press release about one event, name and date the webcast after that event."""
     if not webcasts or len(webcasts) > 2:
@@ -105,8 +112,15 @@ def crawl_company(company, fetcher, renderer=None):
         # pages are always also loaded in the browser and the fuller version kept.
         if render and renderer is not None:
             rendered = renderer.html(url)
-            if rendered and (html is None or len(extract_webcasts(rendered, url)) > len(extract_webcasts(html, url))):
-                html = rendered
+            if rendered and not _is_challenge(rendered):
+                if html is None:
+                    html = rendered
+                else:
+                    plain_n, rendered_n = len(extract_webcasts(html, url)), len(extract_webcasts(rendered, url))
+                    # Keep the version with more webcasts; on a tie, the one with more on it
+                    # (links added by JavaScript, e.g. Apple's press releases).
+                    if rendered_n > plain_n or (rendered_n == plain_n and rendered.count("<a ") > html.count("<a ")):
+                        html = rendered
         pages[url] = html
         return html
 
@@ -118,6 +132,9 @@ def crawl_company(company, fetcher, renderer=None):
                    key=events_rank)
     listing = list(dict.fromkeys([root] + company.get("events_urls", []) + found))
     detail = []
+    # Press releases announcing calls/presentations (results releases, "to present at", …).
+    announcements = [u for u in find_links(home, root, ANNOUNCEMENT_LINK_RE)
+                     if _site(u) == site and u not in listing and re.search(r"news|press|release", u, re.I)]
     for url in listing[:MAX_LISTING_PAGES]:
         html = fetch(url, render=True)
         if not html:
@@ -125,6 +142,19 @@ def crawl_company(company, fetcher, renderer=None):
         results += [(w, url) for w in _with_announcement(extract_webcasts(html, url), html, url)]
         detail += [u for u in find_links(html, url, EVENT_DETAIL_RE)
                    if _site(u) in (site, _site(url)) and u not in detail and u not in listing]
+
+    stream_page = company.get("webcast_url") or root
+    for url in announcements[:MAX_ANNOUNCEMENTS]:
+        html = fetch(url)
+        if not html:
+            continue
+        players = extract_webcasts(html, url)
+        if players:
+            results += [(w, url) for w in _with_announcement(players, html, url)]
+            continue
+        event = announced_event(html, url, stream_page)
+        if event:
+            results.append((event, url))
 
     for url in detail[:MAX_DETAIL_PAGES]:
         html = fetch(url)
@@ -183,7 +213,8 @@ def run(limit=None, max_minutes=None, render=False, tickers=None, fetcher=None):
                     company["crawl_status"] = "unreachable" if found is None else f"ok:{len(found)}"
                     for w, page in found or []:
                         counts["new"] += store.upsert_webcast(webcasts, company["id"], w["url"], w["title"],
-                                                              w["date"], "ir-page", page)
+                                                              w["date"], "ir-page", page,
+                                                              kind=w.get("kind", "webcast"))
                     if found is not None:
                         store.prune_stale(webcasts, company["id"], {w["url"] for w, _ in found})
                     counts["crawled"] += 1

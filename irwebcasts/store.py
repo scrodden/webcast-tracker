@@ -93,7 +93,7 @@ def prune_stale(webcasts, company_id, found_urls):
     players are kept as history even once they drop off the IR site."""
     from .extract import is_webcast_url
     for wid, w in list(webcasts.items()):
-        if (w["company_id"] == company_id and w["source"] == "ir-page"
+        if (w["company_id"] == company_id and w["source"] == "ir-page" and w.get("kind") != "event"
                 and w["url"] not in found_urls and not is_webcast_url(w["url"])):
             del webcasts[wid]
 

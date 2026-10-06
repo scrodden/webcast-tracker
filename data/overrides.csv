@@ -3,12 +3,14 @@
 # Nasdaq's own sector scheme differs from GICS for some companies (e.g. it puts Visa in
 # Consumer Discretionary); fix those here.
 # events_url: page(s) listing the company's events/webcasts, crawled every run (space-separated).
-ticker,ir_url,website,sector,events_url
-GOOGL,https://abc.xyz/investor/,abc.xyz,Communication Services,
-META,https://investor.atmeta.com,meta.com,Communication Services,https://investor.atmeta.com/investor-events/default.aspx
-AMZN,https://ir.aboutamazon.com,aboutamazon.com,Consumer Discretionary,
-V,,,Financials,https://investor.visa.com/events-calendar/
-MA,,,Financials,
-WMT,,,Consumer Staples,https://corporate.walmart.com/news/events
-JNJ,,,,https://www.investor.jnj.com/events-and-presentations/default.aspx
-UNH,,,,https://www.unitedhealthgroup.com/investors.html
+# webcast_url: the fixed page where the company streams its calls, linked from announced events.
+ticker,ir_url,website,sector,events_url,webcast_url
+GOOGL,https://abc.xyz/investor/,abc.xyz,Communication Services,,
+META,https://investor.atmeta.com,meta.com,Communication Services,https://investor.atmeta.com/investor-events/default.aspx,
+AMZN,https://ir.aboutamazon.com,aboutamazon.com,Consumer Discretionary,,
+V,,,Financials,https://investor.visa.com/events-calendar/,
+MA,,,Financials,,
+WMT,,,Consumer Staples,https://corporate.walmart.com/news/events,
+JNJ,,,,https://www.investor.jnj.com/events-and-presentations/default.aspx,
+UNH,,,,https://www.unitedhealthgroup.com/investors.html,https://www.unitedhealthgroup.com/investors.html
+AAPL,,,,,https://www.apple.com/investor/earnings-call/

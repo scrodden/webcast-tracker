@@ -352,6 +352,55 @@ def announcement(html, url):
     return title, when
 
 
+# Sentence ends: a period then a capital, but not "a.m."/"p.m."/"Inc." or a dot inside an address.
+_SENTENCE_END = re.compile(r"(?<![ap]\.m)(?<!\bInc)(?<!\bCo)\.\s+(?=[A-Z(])")
+_STREAM_WORDS = re.compile(r"\bwebcast|\blive[- ]?stream|\bstreaming\b", re.I)
+_URL_TEXT = re.compile(r"\b(?:https?://)?(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|net|org|xyz|io|co)(?:/[\w./-]*)?", re.I)
+# Links on IR pages that lead to announcements of calls and presentations.
+ANNOUNCEMENT_LINK_RE = re.compile(
+    r"results|earnings|conference[- ]call|release[- ]date|to[- ]present|to[- ]participate|fireside|to[- ]host", re.I)
+
+
+def announced_event(html, url, fallback_link):
+    """An event a press release announces without linking a player, e.g.
+    'Apple will provide live streaming of its Q3 2026 financial results conference
+    call beginning at 2:00 p.m. PT on July 30, 2026, at apple.com/investor/earnings-call.'
+    Returns {title, date, url, kind: 'event'} or None."""
+    from .dates import find_event_date
+    soup = BeautifulSoup(html, "lxml")
+    for chrome in soup.find_all(["nav", "header", "footer", "script", "style"]):
+        chrome.decompose()
+    text = _clean(soup.get_text(" "))
+    if not (_ANNOUNCEMENT_URL.search(urlsplit(url).path) or re.search(r"today announced|press release", text, re.I)):
+        return None
+    sentences = _SENTENCE_END.split(text)
+    h1 = soup.find("h1")
+    headline = _clean(h1.get_text(" ")) if h1 else ""
+    for i, sentence in enumerate(sentences):
+        if not _STREAM_WORDS.search(sentence):
+            continue
+        previous = sentences[i - 1] if i else ""
+        # The call is usually dated in the webcast sentence itself, else in the one before
+        # ("…will release its results on Tuesday, October 13… This call will be webcast…").
+        when = find_event_date(sentence) or find_event_date(previous)
+        if not when:
+            continue
+        title = (_event_name(sentence) or _event_name(previous) or _event_name(headline)
+                 or _event_name(slug_title(url)))
+        if not title:
+            continue
+        if "Earnings" in title and not re.search(r"20\d\d", title):
+            title = title.replace(" Earnings Call", f" {when[:4]} Earnings Call")
+        link = fallback_link
+        for u in _URL_TEXT.finditer(sentence):
+            candidate = u.group(0).rstrip("./")
+            if "/" in candidate.split("//")[-1]:  # a specific page, not just a domain
+                link = candidate if candidate.startswith("http") else "https://" + candidate
+                break
+        return {"title": title, "date": when, "url": link, "kind": "event"}
+    return None
+
+
 def page_heading(html):
     """Best-effort event title for an event-detail page."""
     soup = BeautifulSoup(html, "lxml")

@@ -151,6 +151,32 @@ class SlugTitleTests(unittest.TestCase):
                          "First Quarter 2026 Earnings Call")
 
 
+class AnnouncedEventTests(unittest.TestCase):
+    def test_apple_results_release(self):
+        from irwebcasts.extract import announced_event
+        html = """<html><body><h1>Apple reports third quarter results</h1><p>PRESS RELEASE July 30, 2026</p>
+          <p>The dividend is payable on August 13, 2026. Apple will provide live streaming of its Q3 2026 financial
+          results conference call beginning at 2:00 p.m. PT on July 30, 2026, at apple.com/investor/earnings-call .
+          The webcast will be available for replay for approximately two weeks thereafter.</p></body></html>"""
+        e = announced_event(html, "https://www.apple.com/newsroom/2026/07/apple-reports-third-quarter-results/",
+                            "https://investor.apple.com/")
+        self.assertEqual((e["title"], e["date"], e["url"]),
+                         ("Q3 2026 Earnings Call", "2026-07-30", "https://apple.com/investor/earnings-call"))
+
+    def test_unitedhealth_release_date_announcement(self):
+        from irwebcasts.extract import announced_event
+        html = """<html><body><h1>UNITEDHEALTH GROUP ANNOUNCES EARNINGS RELEASE DATE</h1><p>September 15, 2026</p>
+          <p>UnitedHealth Group (NYSE: UNH) will release its third quarter 2026 financial results on Tuesday,
+          October 13, 2026, before the market opens, and will host a teleconference at 8:00 a.m. ET with analysts
+          and investors. This call will be webcast on the Investor Relations page of the company's website
+          (www.unitedhealthgroup.com). The replay will be available through October 27, 2026.</p></body></html>"""
+        e = announced_event(html, "https://www.unitedhealthgroup.com/newsroom/2026/2026-09-15-uhg-announces-q3-"
+                                  "earnings-release-date.html", "https://www.unitedhealthgroup.com/investors.html")
+        self.assertEqual((e["title"], e["date"], e["url"]),
+                         ("Third Quarter 2026 Earnings Call", "2026-10-13",
+                          "https://www.unitedhealthgroup.com/investors.html"))
+
+
 class FakeResponse:
     def __init__(self, url, text):
         self.url, self.text = url, text
