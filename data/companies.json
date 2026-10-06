@@ -1,22 +1,23 @@
 {
  "us-aapl": {
   "country": "US",
-  "crawl_status": "ok:0",
+  "crawl_status": "ok:6",
   "exchange": "Nasdaq",
   "id": "us-aapl",
   "industry": "Computer Manufacturing",
   "ir_checked": "2026-10-05T19:14:39Z",
   "ir_source": "probe",
   "ir_url": "https://investor.apple.com/investor-relations/default.aspx",
-  "last_crawled": "2026-10-05T21:55:53Z",
+  "last_crawled": "2026-10-06T00:42:59Z",
   "listed": true,
-  "market_cap": 4820749537600.0,
+  "market_cap": 4869931924200.0,
   "name": "Apple Inc.",
   "sector": "Information Technology",
   "tickers": [
    "AAPL"
   ],
-  "website": "https://apple.com/tn/"
+  "webcast_url": "https://www.apple.com/investor/earnings-call/",
+  "website": "https://apple.com/ke/"
  },
  "us-googl": {
   "country": "US",
@@ -26,9 +27,9 @@
   "industry": "Computer Software: Programming Data Processing",
   "ir_source": "override",
   "ir_url": "https://abc.xyz/investor/",
-  "last_crawled": "2026-10-05T21:56:54Z",
+  "last_crawled": "2026-10-06T00:43:59Z",
   "listed": true,
-  "market_cap": 4136675200000.0,
+  "market_cap": 4201005000000.0,
   "name": "Alphabet Inc.",
   "sector": "Communication Services",
   "tickers": [
@@ -50,7 +51,7 @@
   "ir_checked": "2026-10-05T19:16:10Z",
   "ir_source": "override",
   "ir_url": "https://www.investor.jnj.com/events-and-presentations/default.aspx",
-  "last_crawled": "2026-10-05T21:55:57Z",
+  "last_crawled": "2026-10-06T00:42:56Z",
   "listed": true,
   "market_cap": 623344371100.0,
   "name": "Johnson & Johnson",
@@ -69,7 +70,7 @@
   "ir_checked": "2026-10-05T19:14:40Z",
   "ir_source": "probe",
   "ir_url": "https://investor.lilly.com/",
-  "last_crawled": "2026-10-05T21:55:49Z",
+  "last_crawled": "2026-10-06T00:42:47Z",
   "listed": true,
   "market_cap": 1082419421190.0,
   "name": "Eli Lilly and Company",
@@ -88,7 +89,7 @@
   "ir_checked": "2026-10-05T19:14:40Z",
   "ir_source": "probe",
   "ir_url": "https://investor.mastercard.com/overview/default.aspx",
-  "last_crawled": "2026-10-05T21:56:40Z",
+  "last_crawled": "2026-10-06T00:43:37Z",
   "listed": true,
   "market_cap": 481805467000.0,
   "name": "Mastercard Incorporated",
@@ -107,9 +108,9 @@
   "ir_checked": "2026-10-05T19:14:39Z",
   "ir_source": "probe",
   "ir_url": "https://www.microsoft.com/en-us/investor/default",
-  "last_crawled": "2026-10-05T21:56:30Z",
+  "last_crawled": "2026-10-06T00:43:25Z",
   "listed": true,
-  "market_cap": 3807819727785.0,
+  "market_cap": 3842942557957.0,
   "name": "Microsoft Corporation",
   "sector": "Information Technology",
   "tickers": [
@@ -126,9 +127,9 @@
   "ir_checked": "2026-10-05T19:14:39Z",
   "ir_source": "probe",
   "ir_url": "https://investor.nvidia.com/home/default.aspx",
-  "last_crawled": "2026-10-05T21:56:07Z",
+  "last_crawled": "2026-10-06T00:43:06Z",
   "listed": true,
-  "market_cap": 5563726000000.0,
+  "market_cap": 5638195000000.0,
   "name": "NVIDIA Corporation",
   "sector": "Information Technology",
   "tickers": [
@@ -138,7 +139,7 @@
  },
  "us-unh": {
   "country": "US",
-  "crawl_status": "ok:0",
+  "crawl_status": "ok:1",
   "events_urls": [
    "https://www.unitedhealthgroup.com/investors.html"
   ],
@@ -147,7 +148,7 @@
   "industry": "Medical Specialities",
   "ir_source": "override",
   "ir_url": "https://www.unitedhealthgroup.com/investors.html",
-  "last_crawled": "2026-10-05T21:55:52Z",
+  "last_crawled": "2026-10-06T00:42:55Z",
   "listed": true,
   "market_cap": 327801638124.0,
   "name": "UnitedHealth Group Incorporated",
@@ -155,6 +156,7 @@
   "tickers": [
    "UNH"
   ],
+  "webcast_url": "https://www.unitedhealthgroup.com/investors.html",
   "website": "http://www.unitedhealthgroup.com/"
  },
  "us-v": {
@@ -169,7 +171,7 @@
   "ir_checked": "2026-10-05T19:14:41Z",
   "ir_source": "override",
   "ir_url": "https://investor.visa.com/events-calendar/",
-  "last_crawled": "2026-10-05T21:56:06Z",
+  "last_crawled": "2026-10-06T00:43:05Z",
   "listed": true,
   "market_cap": 642963867716.0,
   "name": "Visa Inc.",
@@ -191,7 +193,7 @@
   "ir_checked": "2026-10-05T19:14:45Z",
   "ir_source": "override",
   "ir_url": "https://corporate.walmart.com/news/events",
-  "last_crawled": "2026-10-05T21:56:12Z",
+  "last_crawled": "2026-10-06T00:43:10Z",
   "listed": true,
   "market_cap": 827172383087.0,
   "name": "Walmart Inc.",
