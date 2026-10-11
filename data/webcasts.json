@@ -11,25 +11,13 @@
   "title": "UBS Global Technology and AI Conference",
   "url": "https://investor.nvidia.com"
  },
- "0ea8c17f8180": {
-  "company_id": "us-googl",
-  "date": null,
-  "first_seen": "2026-10-05T20:43:59Z",
-  "id": "0ea8c17f8180",
-  "kind": "webcast",
-  "last_seen": "2026-10-10T13:40:10Z",
-  "source": "ir-page",
-  "source_url": "https://abc.xyz/investor/",
-  "title": "2025 Q2 Earnings Call",
-  "url": "https://abc.xyz/investor/events/event-details/2025/2025-Q2-Earnings-Call"
- },
  "114c5af865f3": {
   "company_id": "us-msft",
   "date": "2026-07-29",
   "first_seen": "2026-10-08T14:35:24Z",
   "id": "114c5af865f3",
   "kind": "webcast",
-  "last_seen": "2026-10-10T13:39:42Z",
+  "last_seen": "2026-10-11T14:02:44Z",
   "source": "ir-page",
   "source_url": "https://www.microsoft.com/en-us/investor/default",
   "title": "FY 2026 Q4 Earnings Call",
@@ -51,7 +39,7 @@
   "date": "2026-09-16",
   "first_seen": "2026-10-05T19:44:50Z",
   "id": "1a843205d1c7",
-  "last_seen": "2026-10-10T13:39:23Z",
+  "last_seen": "2026-10-11T14:02:20Z",
   "source": "ir-page",
   "source_url": "https://corporate.walmart.com/news/events/2026-piper-sandler-growth-frontiers-conference",
   "title": "Piper Sandler Growth Frontiers Conference",
@@ -136,18 +124,6 @@
   "title": "Q4 2025 Earnings Call",
   "url": "https://edge.media-server.com/mmc/p/8azdiqoy"
  },
- "3b8076fd46b1": {
-  "company_id": "us-googl",
-  "date": null,
-  "first_seen": "2026-10-05T20:43:59Z",
-  "id": "3b8076fd46b1",
-  "kind": "webcast",
-  "last_seen": "2026-10-10T13:40:10Z",
-  "source": "ir-page",
-  "source_url": "https://abc.xyz/investor/",
-  "title": "2025 Q4 Earnings Call",
-  "url": "https://abc.xyz/investor/events/event-details/2026/2025-Q4-Earnings-Call-2026-Dr_C033hS6/default.aspx"
- },
  "42a776a4f75d": {
   "company_id": "us-nvda",
   "date": "2026-06-04",
@@ -177,23 +153,11 @@
   "date": "2024-11-13",
   "first_seen": "2026-10-05T19:45:09Z",
   "id": "546cdfe2c329",
-  "last_seen": "2026-10-10T13:39:43Z",
+  "last_seen": "2026-10-11T14:02:38Z",
   "source": "ir-page",
   "source_url": "https://investor.mastercard.com/events-and-presentations/events/event-details/2024/Mastercard-Investment-Community-Meeting/default.aspx",
   "title": "Mastercard Investment Community Meeting",
   "url": "https://app.webinar.net/z4NPDbqEdjG"
- },
- "5529c89d6d4d": {
-  "company_id": "us-googl",
-  "date": null,
-  "first_seen": "2026-10-05T20:43:59Z",
-  "id": "5529c89d6d4d",
-  "kind": "webcast",
-  "last_seen": "2026-10-10T13:40:10Z",
-  "source": "ir-page",
-  "source_url": "https://abc.xyz/investor/",
-  "title": "2025 Q1 Earnings Call",
-  "url": "https://abc.xyz/investor/events/event-details/2025/2025-Q1-Earnings-Call/default.aspx"
  },
  "62838b3ace22": {
   "company_id": "us-googl",
@@ -213,7 +177,7 @@
   "first_seen": "2026-10-05T20:43:26Z",
   "id": "69f73b197214",
   "kind": "webcast",
-  "last_seen": "2026-10-10T13:39:23Z",
+  "last_seen": "2026-10-11T14:02:20Z",
   "source": "ir-page",
   "source_url": "https://corporate.walmart.com/news/events/2026-goldman-sachs-global-retailing-conference",
   "title": "Goldman Sachs Global Retailing Conference",
@@ -243,18 +207,6 @@
   "title": "Goldman Sachs Communacopia + Technology Conference",
   "url": "https://investor.nvidia.com"
  },
- "7f1feeaf79ab": {
-  "company_id": "us-googl",
-  "date": null,
-  "first_seen": "2026-10-05T20:43:59Z",
-  "id": "7f1feeaf79ab",
-  "kind": "webcast",
-  "last_seen": "2026-10-10T13:40:10Z",
-  "source": "ir-page",
-  "source_url": "https://abc.xyz/investor/",
-  "title": "2026 Q2 Earnings Call",
-  "url": "https://abc.xyz/investor/events/event-details/2026/2026-Q2-Earnings-Call-2026-GgTAq7Is0z/default.aspx"
- },
  "7fd45a4eaa51": {
   "company_id": "us-lly",
   "date": "2025-09-05",
@@ -272,7 +224,7 @@
   "first_seen": "2026-10-05T20:43:26Z",
   "id": "8578d7ab6386",
   "kind": "webcast",
-  "last_seen": "2026-10-10T13:39:23Z",
+  "last_seen": "2026-10-11T14:02:20Z",
   "source": "ir-page",
   "source_url": "https://corporate.walmart.com/news/events/2026-goldman-sachs-communacopia-and-technology-conference",
   "title": "Goldman Sachs Communacopia and Technology Conference",
@@ -313,18 +265,6 @@
   "source_url": "https://www.globenewswire.com/news-release/2026/08/26/3351702/0/en/nvidia-announces-financial-results-for-second-quarter-fiscal-2027.html",
   "title": "Second Quarter Fiscal 2027 Earnings Call",
   "url": "https://investor.nvidia.com"
- },
- "a0da303f8b9e": {
-  "company_id": "us-googl",
-  "date": null,
-  "first_seen": "2026-10-05T20:43:59Z",
-  "id": "a0da303f8b9e",
-  "kind": "webcast",
-  "last_seen": "2026-10-10T13:40:10Z",
-  "source": "ir-page",
-  "source_url": "https://abc.xyz/investor/",
-  "title": "2025 Q3 Earnings Call",
-  "url": "https://abc.xyz/investor/events/event-details/2025/2025-Q3-Earnings-Call-2025-4OI4Bac_Q9/default.aspx"
  },
  "a20451e2ef23": {
   "company_id": "us-nvda",
@@ -411,23 +351,11 @@
   "date": "2026-07-29",
   "first_seen": "2026-10-05T19:45:08Z",
   "id": "c721367ce26f",
-  "last_seen": "2026-10-10T13:39:42Z",
+  "last_seen": "2026-10-11T14:02:44Z",
   "source": "ir-page",
   "source_url": "https://www.microsoft.com/en-us/investor/default",
   "title": "FY 2026 Q4 Earnings Call",
   "url": "https://www.microsoft.com/en-us/investor/events/fy-2026/earnings-fy-2026-q4"
- },
- "c7a317d19063": {
-  "company_id": "us-googl",
-  "date": null,
-  "first_seen": "2026-10-07T14:30:31Z",
-  "id": "c7a317d19063",
-  "kind": "webcast",
-  "last_seen": "2026-10-10T13:40:10Z",
-  "source": "ir-page",
-  "source_url": "https://abc.xyz/investor/",
-  "title": "2026 Q3 Earnings Call",
-  "url": "https://abc.xyz/investor/events/event-details/2026/2026-Q3-Earnings-Call-2026-Ujou16CTw9/default.aspx"
  },
  "d0807d42881b": {
   "company_id": "us-nvda",
@@ -470,7 +398,7 @@
   "first_seen": "2026-10-06T00:42:55Z",
   "id": "ee33ad978b59",
   "kind": "event",
-  "last_seen": "2026-10-10T13:39:09Z",
+  "last_seen": "2026-10-11T14:02:06Z",
   "source": "ir-page",
   "source_url": "https://www.unitedhealthgroup.com/newsroom/2026/2026-09-15-uhg-announces-q3-earnings-release-date.html",
   "title": "Third Quarter 2026 Earnings Call",
@@ -481,7 +409,7 @@
   "date": "2026-06-10",
   "first_seen": "2026-10-05T19:44:50Z",
   "id": "eec5dc6dcfe2",
-  "last_seen": "2026-10-10T13:39:23Z",
+  "last_seen": "2026-10-11T14:02:20Z",
   "source": "ir-page",
   "source_url": "https://corporate.walmart.com/news/events/2026-evercore-isi-consumer-and-retail-conference",
   "title": "Evercore ISI Consumer and Retail Conference",
@@ -522,17 +450,5 @@
   "source_url": "https://www.apple.com/newsroom/2026/01/apple-reports-first-quarter-results/",
   "title": "Q1 2026 Earnings Call",
   "url": "https://apple.com/investor/earnings-call"
- },
- "ff1e10a65205": {
-  "company_id": "us-googl",
-  "date": null,
-  "first_seen": "2026-10-05T20:43:59Z",
-  "id": "ff1e10a65205",
-  "kind": "webcast",
-  "last_seen": "2026-10-10T13:40:10Z",
-  "source": "ir-page",
-  "source_url": "https://abc.xyz/investor/",
-  "title": "2026 Q1 Earnings Call",
-  "url": "https://abc.xyz/investor/events/event-details/2026/2026-Q1-Earnings-Call-2026-nW8kCrBAKS/default.aspx"
  }
 }
