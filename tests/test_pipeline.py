@@ -177,6 +177,18 @@ class AnnouncedEventTests(unittest.TestCase):
                           "https://www.unitedhealthgroup.com/investors.html"))
 
 
+class IndexTests(unittest.TestCase):
+    def test_sp500_wikipedia_table(self):
+        from irwebcasts.indexes import parse_wikipedia
+        html = """<table id="constituents"><tr><th>Symbol</th><th>Security</th><th>GICS Sector</th>
+          <th>GICS Sub-Industry</th></tr><tr><td>BRK.B</td><td>Berkshire Hathaway</td><td>Financials</td>
+          <td>Multi-Sector Holdings</td></tr><tr><td>V</td><td>Visa Inc.</td><td>Financials</td>
+          <td>Transaction &amp; Payment Processing Services</td></tr></table>"""
+        rows = parse_wikipedia(html)
+        self.assertEqual([r["ticker"] for r in rows], ["BRK.B", "V"])
+        self.assertEqual(rows[1]["sector"], "Financials")
+
+
 class FakeResponse:
     def __init__(self, url, text):
         self.url, self.text = url, text

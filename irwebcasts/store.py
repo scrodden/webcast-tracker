@@ -112,7 +112,8 @@ def load_watchlist():
     """Tickers from data/watchlist.txt, or None to cover every company."""
     if not config.WATCHLIST_FILE.exists():
         return None
-    tickers = [line.split("#")[0].strip().upper() for line in config.WATCHLIST_FILE.read_text().splitlines()]
+    tickers = [line.split("#")[0].strip() for line in config.WATCHLIST_FILE.read_text().splitlines()]
+    tickers = [t if t.startswith("@") else t.upper() for t in tickers]
     return [t for t in tickers if t] or None
 
 

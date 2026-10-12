@@ -63,6 +63,17 @@ class Fetcher:
                 time.sleep(2 ** attempt * 2)
         return None
 
+    def status(self, url, timeout=10):
+        """HTTP status of a page (following redirects), or None if it doesn't answer.
+        Unlike get(), a refusal (403) is reported rather than hidden."""
+        host = urlsplit(url).netloc
+        self._wait(host)
+        try:
+            resp = self.session.get(url, timeout=timeout)
+        except requests.RequestException:
+            return None, None
+        return resp.status_code, resp
+
     def get_json(self, url, **kwargs):
         resp = self.get(url, **kwargs)
         if resp is None:

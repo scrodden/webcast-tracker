@@ -150,7 +150,8 @@ const pages = {
       <div class="facts"><span><b>${esc(c.t.join(", "))}</b> · ${esc(c.x || "")}</span>
       <span>Sector: <a href="index.html?sector=${encodeURIComponent(c.s)}"><b>${esc(c.s)}</b></a></span>
       ${c.i ? `<span>Industry: <b>${esc(c.i)}</b></span>` : ""}
-      ${c.ir ? `<span><a href="${esc(c.ir)}" target="_blank" rel="noopener">Investor relations site ↗</a></span>` : `<span>IR site not found yet</span>`}</div>`;
+      ${c.ir ? `<span><a href="${esc(c.ir)}" target="_blank" rel="noopener">Investor relations site ↗</a></span>` : `<span>IR site not found yet</span>`}</div>
+      ${c.irb ? `<p class="sub">${esc(c.n)}'s investor site doesn't allow automated collection, so its webcasts may be missing here. <a href="${esc(c.ir)}" target="_blank" rel="noopener">See its events and webcasts on its own site ↗</a></p>` : ""}`;
     yearOptions($("#range"), rows);
     webcastTable({ rows, companies, conferences, container: $("#list"), showCompany: false,
       filters: { q: $("#q"), type: $("#type"), range: $("#range") } });

@@ -64,6 +64,7 @@ def build(out_dir=None):
             "id": c["id"], "n": c.get("name") or c["id"], "t": c.get("tickers", []),
             "x": c.get("exchange"), "co": c.get("country", "US"), "s": c.get("sector", sectors.OTHER),
             "i": c.get("industry"), "ir": c.get("ir_url"), "w": counts.get(c["id"], 0),
+            "irb": bool(c.get("ir_blocked")), "ix": c.get("indexes", []),
         })
     company_rows.sort(key=lambda r: r["n"].lower())
 

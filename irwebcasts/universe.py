@@ -20,7 +20,9 @@ def _group_key(name):
     return re.sub(r"[^a-z0-9]", "", name.lower())
 
 
-def refresh(limit=None, tickers=None, fetcher=None):
+def refresh(limit=None, tickers=None, fetcher=None, index_rows=None):
+    """index_rows: [{ticker, sector, industry}] from an index list; their GICS
+    sectors replace Nasdaq's for those companies."""
     fetcher = fetcher or Fetcher()
     listed = fetcher.get(nasdaq.NASDAQ_LISTED_URL)
     other = fetcher.get(nasdaq.OTHER_LISTED_URL)
@@ -36,6 +38,7 @@ def refresh(limit=None, tickers=None, fetcher=None):
         groups.setdefault((_group_key(sec["name"]), sec["exchange"]), []).append(sec)
 
     wanted = {t.upper() for t in tickers} if tickers else None
+    gics_by_ticker = {r["ticker"]: r for r in (index_rows or [])}
     companies = store.load_companies()
     by_ticker = store.companies_by_ticker(companies)
     overrides = store.load_overrides()
@@ -60,6 +63,10 @@ def refresh(limit=None, tickers=None, fetcher=None):
         if info:
             company["sector"] = info["sector"]
             company["industry"] = info["industry"]
+        gics = next((gics_by_ticker[t] for t in symbols if t in gics_by_ticker), None)
+        if gics:
+            company["sector"], company["industry"] = gics["sector"], gics["industry"]
+            company["indexes"] = sorted(set(company.get("indexes", [])) | {"S&P 500"})
         company.setdefault("sector", "Other")
         site = next((websites[w] for w in map(wikidata.normalize_ticker, symbols) if w in websites), None)
         if site and company.get("website_source") != "override":

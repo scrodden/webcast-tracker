@@ -67,6 +67,24 @@ def debug(urls):
         renderer.close()
 
 
+def expand_watchlist(entries):
+    """Watchlist lines may name an index ('@sp500') as well as tickers."""
+    if not entries:
+        return None, None
+    from .http import Fetcher
+    from .indexes import INDEXES
+    tickers, rows = [], []
+    for entry in entries:
+        if entry.lower() in INDEXES:
+            members = INDEXES[entry.lower()](Fetcher())
+            print(f"watchlist: {entry} has {len(members)} members")
+            rows += members
+            tickers += [m["ticker"] for m in members]
+        else:
+            tickers.append(entry)
+    return list(dict.fromkeys(tickers)), rows
+
+
 def press_releases(tickers=None, months=1):
     """Events announced on GlobeNewswire (reaches companies whose IR sites block crawlers)."""
     from .http import Fetcher
@@ -152,12 +170,12 @@ def main(argv=None):
     elif args.step == "debug":
         debug(args.urls)
     elif args.step == "report":
-        report(store.load_watchlist())
+        report(expand_watchlist(store.load_watchlist())[0])
     elif args.step == "daily":
-        tickers = store.load_watchlist()
+        tickers, index_rows = expand_watchlist(store.load_watchlist())
         if tickers:
             print(f"watchlist: limiting this run to {len(tickers)} tickers")
-        print("universe:", universe.refresh(tickers=tickers))
+        print("universe:", universe.refresh(tickers=tickers, index_rows=index_rows))
         print("discover:", discover.run(max_minutes=args.discover_minutes, tickers=tickers))
         print("crawl:", crawl.run(max_minutes=args.crawl_minutes, render=not args.no_render, tickers=tickers))
         print("press releases:", press_releases(tickers))

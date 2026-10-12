@@ -1,12 +1,4 @@
-# Pilot: while this file lists tickers, every run only handles these companies.
-# Delete the tickers (or the file) to cover every U.S.-listed company.
-NVDA
-AAPL
-MSFT
-GOOG
-LLY
-JNJ
-V
-MA
-UNH
-WMT
+# Companies to track. While this file lists anything, every run only handles these.
+# Lines may be tickers or an index name (@sp500). Delete everything to cover every
+# U.S.-listed company.
+@sp500

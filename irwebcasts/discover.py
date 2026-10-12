@@ -26,6 +26,7 @@ DDG_URL = "https://html.duckduckgo.com/html/"
 SEARCH_DELAY = 4.0  # seconds between searches, shared by all workers
 _search_lock = threading.Lock()
 _last_search = [0.0]
+_ddg_refusals = [0]
 
 _IR_WORDS = ("investor", "sec filings", "stock", "events", "presentations", "webcast",
              "annual report", "quarterly results", "governance", "shareholder", "dividend",
@@ -112,8 +113,13 @@ def _search_results(query, fetcher, api_key):
             data = fetcher.get_json(BRAVE_URL, params={"q": query, "count": 10}, retries=1,
                                     headers={"X-Subscription-Token": api_key, "Accept": "application/json"})
             return [r.get("url", "") for r in ((data or {}).get("web") or {}).get("results", [])]
+        if _ddg_refusals[0] >= 3:
+            return []  # DuckDuckGo is refusing automated searches this run
         resp = fetcher.get(DDG_URL, params={"q": query}, retries=1)
     results = parse_ddg(resp.text) if resp is not None else []
+    _ddg_refusals[0] = 0 if results else _ddg_refusals[0] + 1
+    if _ddg_refusals[0] == 3:
+        print("search: DuckDuckGo is refusing automated searches; skipping search for the rest of this run")
     if not results:
         status = "no response" if resp is None else f"HTTP {resp.status_code}, {len(resp.text)} bytes"
         print(f"search: no results for {query!r} ({status})")
@@ -151,11 +157,22 @@ def search(company, fetcher, api_key=None):
     return sorted(urls, key=score, reverse=True)[:4]
 
 
-def _try_domain(domain, fetcher):
+_BOT_CHECK = re.compile(r"Just a moment|Performing security verification|Access Denied|cf-chl|captcha", re.I)
+
+
+def _try_domain(domain, fetcher, blocked):
+    """IR site on a domain. A dedicated investor host (investors.<d>, ir.<d>, …) that
+    exists but turns automated visitors away is remembered in `blocked`."""
     for url in candidates(domain):
-        resp = fetcher.get(url, retries=0)
-        if resp is not None and looks_like_ir(resp.text):
+        status, resp = fetcher.status(url)
+        if resp is None:
+            continue
+        if status < 400 and looks_like_ir(resp.text):
             return resp.url, "probe"
+        host = urlsplit(url).netloc
+        if status in (401, 403, 429, 503) and re.match(r"(www\.)?(investors?|ir|stock)\.", host) \
+                and (_BOT_CHECK.search(resp.text) or status == 403):
+            blocked.append(url)
     resp = fetcher.get(f"https://www.{domain}", retries=0)
     if resp is not None:
         soup = BeautifulSoup(resp.text, "lxml")
@@ -169,19 +186,23 @@ def _try_domain(domain, fetcher):
 
 def discover_one(company, fetcher, search_key=None):
     domain = pick_domain(company)
+    blocked = []
     if domain:
-        url, how = _try_domain(domain, fetcher)
+        url, how = _try_domain(domain, fetcher, blocked)
         if url:
             return url, how
-    for url in search(company, fetcher, search_key):
-        resp = fetcher.get(url, retries=0)
-        if resp is not None and looks_like_ir(resp.text):
-            return resp.url, "search"
+    if not blocked:
+        for url in search(company, fetcher, search_key):
+            resp = fetcher.get(url, retries=0)
+            if resp is not None and looks_like_ir(resp.text):
+                return resp.url, "search"
     for guess in guess_domains(company):
-        if guess != domain:
-            url, how = _try_domain(guess, fetcher)
+        if guess != domain and not blocked:
+            url, how = _try_domain(guess, fetcher, blocked)
             if url:
                 return url, "name-guess"
+    if blocked:
+        return blocked[0], "blocked"
     return None, None
 
 
@@ -216,6 +237,7 @@ def run(limit=None, retry_failed=False, max_minutes=None, tickers=None, fetcher=
             counts["checked"] += 1
             if url:
                 company["ir_url"], company["ir_source"] = url, how
+                company["ir_blocked"] = how == "blocked"
                 counts["found"] += 1
             if counts["checked"] % 50 == 0:
                 store.save_companies(companies)
