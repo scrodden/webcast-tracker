@@ -72,7 +72,8 @@ HOST_NAMES = {
 # Conference platforms whose URL path carries a per-event code.
 _EVENT_CODE_HOSTS = {"wsw.com": 1, "kvgo.com": 1}
 
-_STOP = {"the", "annual", "virtual", "inaugural", "global", "securities", "investor", "investors", "a", "an"}
+_STOP = {"the", "annual", "virtual", "inaugural", "global", "securities", "investor", "investors", "a", "an",
+         "and", "s"}  # "&"/"+"/"and" and possessives (Baird's) are written inconsistently
 
 
 def extract_conference_name(text):

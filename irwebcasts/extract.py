@@ -28,7 +28,8 @@ WEBCAST_HOSTS = (
 )
 
 # Hosts that are dial-in registration pages, not webcasts.
-EXCLUDED_HOSTS = ("register.vevent.com", "vevent.com", "register-conf.media-server.com")
+EXCLUDED_HOSTS = ("register.vevent.com", "vevent.com", "register-conf.media-server.com",
+                  "mimecastprotect.com")  # mimecast links are opaque and expire
 
 _LINK_TEXT_RE = re.compile(
     r"\b(webcast|listen|replay|archived? (?:audio|presentation|event)|live audio|"
@@ -146,9 +147,20 @@ def _usable(text):
         return None
     # Document labels and site sections ("HTML for 2025 Q2", "SEC Filings", "Overview").
     if re.fullmatch(r"(?:html|pdf|xbrl|10-[qk]|8-k|view all|see all|sec filings|investor relations|overview|"
-                    r"news center|newsroom|home|press release|news release|earnings release|.*\bleadership)"
-                    r"(?:\s+for\b.*|\s*\(.*\))?", text, re.I):
+                    r"news center|newsroom|home|press release|news release|earnings release|.*\bleadership|"
+                    r"investor email alerts?|email alerts?|external link|contact us|quick links|site search|search|"
+                    r"supporting materials|speakers?|speaker\(s\)|webcast audio|earnings webcast audio|audio|"
+                    r"press release and presentation|presentation materials|materials|resources|menu|"
+                    r"subscribe|sign up|stock quote|stock information|financial information|events?(?: & presentations)?)"
+                    r"\W*(?:\s+for\b.*|\s*\(.*\))?", text, re.I):
         return None
+    if re.fullmatch(r"\(?\s*(?:audio|video|mp3|pdf)[^)]*\)?", text, re.I):
+        return None  # "(Audio, 27.9 MB)"
+    if re.fullmatch(r"(?:select your calendar|add to calendar|quarter ended|quarter \d|show transcript.*|"
+                    r"(?:mon|tues|wednes|thurs|fri|satur|sun)day|replay|live|upcoming|past)\W*", text, re.I):
+        return None
+    if re.match(r"(?:https?://|www\.)", text, re.I):
+        return None  # an address, not a name
     if re.match(r"about\b", text, re.I):
         return None  # 'About Alphabet Inc.' boilerplate at the end of releases
     if len(text) < 8 or _is_generic(text) or re.fullmatch(r"[\d\s:/.,apmAPMET-]+", text):
@@ -294,6 +306,8 @@ def extract_webcasts(html, base_url):
         if is_webcast_url(href):
             title = slug_title(href) or title or title_from_url(href)
         else:
+            if re.search(r"/news|press-release(?!-webcast)|news-release|/press/|financial-release|-announces-", urlsplit(href).path, re.I):
+                continue  # an announcement about a webcast, not the webcast itself
             # A page on the company's own site counts only if it is clearly about a
             # specific event: dated, or named in its address.
             url_title = slug_title(href) or title_from_url(href)

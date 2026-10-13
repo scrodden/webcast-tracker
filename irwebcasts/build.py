@@ -45,11 +45,43 @@ def dedupe(webcasts):
     return [v[1] if isinstance(v, tuple) else v for v in best.values()]
 
 
+MAX_AGE_DAYS = 2 * 365
+
+
+def clean(webcasts, companies):
+    """Apply today's rules to everything collected so far: fix or drop titles that
+    are page furniture, drop press-release pages and opaque links, and old events."""
+    from datetime import date, timedelta
+    from urllib.parse import urlsplit
+    from .extract import EXCLUDED_HOSTS, _usable, is_webcast_url, slug_title, title_from_url
+    cutoff = (date.today() - timedelta(days=MAX_AGE_DAYS)).isoformat()
+    out = []
+    for w in webcasts:
+        host = urlsplit(w["url"]).netloc.lower()
+        if any(host == h or host.endswith("." + h) for h in EXCLUDED_HOSTS):
+            continue
+        if w.get("date") and w["date"] < cutoff:
+            continue
+        if (not is_webcast_url(w["url"]) and w.get("kind") != "event"
+                and re.search(r"/news|press-release(?!-webcast)|news-release|/press/|financial-release|-announces-", urlsplit(w["url"]).path, re.I)):
+            continue
+        title = w.get("title") or ""
+        if not title or not _usable(title):
+            title = slug_title(w["url"]) or title_from_url(w["url"]) or ""
+        if not title:
+            # A player link with no usable name on its page: say what it is at least.
+            if not is_webcast_url(w["url"]):
+                continue
+            title = "Webcast"
+        out.append({**w, "title": title})
+    return out
+
+
 def build(out_dir=None):
     out = out_dir or config.SITE_DIR
     companies = store.load_companies()
     webcasts = list(store.load_webcasts().values())
-    webcasts = dedupe([w for w in webcasts if w["company_id"] in companies])
+    webcasts = dedupe(clean([w for w in webcasts if w["company_id"] in companies], companies))
     confs = conferences.build(webcasts, companies)
 
     counts = {}
