@@ -189,6 +189,40 @@ class IndexTests(unittest.TestCase):
         self.assertEqual(rows[1]["sector"], "Financials")
 
 
+class BotAuthTests(unittest.TestCase):
+    def test_thumbprint_matches_cloudflare_example(self):
+        from irwebcasts import botauth
+        # The RFC 9421 Ed25519 test key and keyid used in Cloudflare's Web Bot Auth docs.
+        jwk = {"kty": "OKP", "crv": "Ed25519", "x": "JrQLj5P_89iXES9-vFgrIy29clF9CC_oPPsw3c5D0bs"}
+        self.assertEqual(botauth.thumbprint(jwk), "poqkLGiymh_W0uP6PZFw-dvez3QJT5SolqXBCW38r0U")
+
+    def test_signature_verifies_and_covers_the_host(self):
+        import base64
+        import re as _re
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+        from irwebcasts import botauth
+        private, jwk, keyid = botauth.generate()
+        signer = botauth.Signer(private, "https://bot.example.workers.dev/")
+        h = signer.headers("https://investor.visa.com:443/events-calendar/", now=1760000000, nonce="n")
+        self.assertEqual(h["Signature-Agent"], '"https://bot.example.workers.dev"')
+        params = h["Signature-Input"].split("=", 1)[1]
+        self.assertIn(f'keyid="{keyid}"', params)
+        self.assertIn('tag="web-bot-auth"', params)
+        self.assertIn("expires=1760000060", params)
+        base = ('"@authority": investor.visa.com\n"signature-agent": "https://bot.example.workers.dev"\n'
+                f'"@signature-params": {params}')
+        sig = base64.b64decode(_re.match(r"sig1=:(.*):", h["Signature"]).group(1))
+        Ed25519PublicKey.from_public_bytes(botauth.b64url_decode(jwk["x"])).verify(sig, base.encode())
+
+    def test_nonce_is_64_bytes(self):
+        import base64
+        import re as _re
+        from irwebcasts import botauth
+        signer = botauth.Signer(botauth.generate()[0], "https://bot.example.workers.dev")
+        nonce = _re.search(r'nonce="([^"]+)"', signer.headers("https://example.com/")["Signature-Input"]).group(1)
+        self.assertEqual(len(base64.b64decode(nonce)), 64)
+
+
 class FakeResponse:
     def __init__(self, url, text):
         self.url, self.text = url, text

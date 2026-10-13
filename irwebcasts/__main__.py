@@ -147,6 +147,7 @@ def main(argv=None):
 
     sub.add_parser("build")
     sub.add_parser("report")
+    sub.add_parser("botkey", help="generate the crawler's Web Bot Auth signing key")
     dbg = sub.add_parser("debug", help="show what the crawler sees on given pages")
     dbg.add_argument("urls", nargs="+")
 
@@ -169,6 +170,13 @@ def main(argv=None):
         print("build:", build.build())
     elif args.step == "debug":
         debug(args.urls)
+    elif args.step == "botkey":
+        from . import botauth
+        private, jwk, keyid = botauth.generate()
+        print("Keep the private key secret: it goes only into the two secret settings below.\n")
+        print(f"SIGNING_KEY (private, secret): {private}")
+        print(f"PUBLIC_KEY  (public):          {jwk['x']}")
+        print(f"Key id (JWK thumbprint):       {keyid}")
     elif args.step == "report":
         report(expand_watchlist(store.load_watchlist())[0])
     elif args.step == "daily":

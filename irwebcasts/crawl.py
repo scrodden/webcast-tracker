@@ -11,7 +11,7 @@ import threading
 import time
 from urllib.parse import urlsplit
 
-from . import config, store
+from . import botauth, config, store
 from .extract import (ANNOUNCEMENT_LINK_RE, EVENT_DETAIL_RE, EVENTS_LINK_RE, announced_event, announcement,
                       extract_webcasts, find_links, page_heading)
 from .http import Fetcher
@@ -41,9 +41,15 @@ class Renderer:
             executable_path=os.environ.get("IRW_CHROMIUM") or None,
             proxy={"server": proxy} if proxy else None,
             args=["--ignore-certificate-errors"] if proxy else [])
+        self._context = self._browser.new_context(user_agent=config.USER_AGENT)
+        signer = botauth.from_env()
+        if signer:
+            # Every request the page makes (documents, scripts, data) carries the signature.
+            self._context.route("**/*", lambda route, request: route.continue_(
+                headers={**request.headers, **signer.headers(request.url)}))
 
     def html(self, url):
-        page = self._browser.new_page()
+        page = self._context.new_page()
         try:
             page.goto(url, wait_until="domcontentloaded", timeout=30000)
             try:

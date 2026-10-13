@@ -5,12 +5,28 @@ from urllib.parse import urlsplit
 
 import requests
 
-from . import config
+from . import botauth, config
+
+
+class _SigningSession(requests.Session):
+    """A session that signs every request, re-signing on redirects to another host."""
+
+    def __init__(self, signer):
+        super().__init__()
+        self.signer = signer
+        if signer:
+            self.auth = botauth.requests_auth(signer)
+
+    def rebuild_auth(self, prepared_request, response):
+        super().rebuild_auth(prepared_request, response)
+        if self.signer:
+            prepared_request.headers.update(self.signer.headers(prepared_request.url))
 
 
 class Fetcher:
-    def __init__(self, user_agent=config.USER_AGENT, respect_robots=True):
-        self.session = requests.Session()
+    def __init__(self, user_agent=config.USER_AGENT, respect_robots=True, signer="env"):
+        self.signer = botauth.from_env() if signer == "env" else signer
+        self.session = _SigningSession(self.signer)
         self.session.headers.update({
             "User-Agent": user_agent,
             "Accept": "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",

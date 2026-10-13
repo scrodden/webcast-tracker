@@ -15,9 +15,11 @@ CONFERENCE_ALIASES_FILE = DATA_DIR / "conference_aliases.json"
 # Tickers to limit every run to (one per line). Empty = the whole U.S. market.
 WATCHLIST_FILE = DATA_DIR / "watchlist.txt"
 
+# A stable name sites can recognise; the link explains what the bot does.
+BOT_INFO_URL = os.environ.get("IRW_KEY_DIRECTORY", "https://github.com/scrodden/webcast-tracker").rstrip("/") + "/"
 USER_AGENT = os.environ.get(
     "IRW_USER_AGENT",
-    "Mozilla/5.0 (compatible; IRWebcastsBot/0.2; +https://github.com/scrodden/webcast-tracker)",
+    f"Mozilla/5.0 (compatible; WebcastTrackerBot/1.0; +{BOT_INFO_URL})",
 )
 
 # Data APIs (not web pages), so robots.txt doesn't apply to them.

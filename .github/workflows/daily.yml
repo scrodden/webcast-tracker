@@ -28,6 +28,9 @@ jobs:
       # Optional: a Brave Search API key is used instead of DuckDuckGo for
       # "<company> investor relations" searches.
       BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+      # Web Bot Auth (see bot/README.md): requests are signed when both are set.
+      IRW_SIGNING_KEY: ${{ secrets.IRW_SIGNING_KEY }}
+      IRW_KEY_DIRECTORY: ${{ vars.IRW_KEY_DIRECTORY }}
     steps:
       - uses: actions/checkout@v4
 
