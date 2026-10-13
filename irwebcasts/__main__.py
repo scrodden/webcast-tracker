@@ -50,7 +50,7 @@ def debug(urls):
             resp = fetcher.get(url, retries=0)
             describe("plain", url, resp.text if resp is not None else None,
                      f"HTTP {resp.status_code}" if resp is not None else "failed/blocked")
-            page = renderer._browser.new_page()
+            page = renderer._context.new_page()
             try:
                 r = page.goto(url, wait_until="domcontentloaded", timeout=30000)
                 try:
